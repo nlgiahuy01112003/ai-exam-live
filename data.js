@@ -446,5 +446,4 @@ const quizData = [
         "correct": 0,
         "explanation": "<b>Giải thích chi tiết:</b><br>\n<b>Bước 1: Kích thước của ma trận chuyển vị $A^T$</b><br>\n- $A$ có kích thước $(m \\times n)$. Khi chuyển vị, số hàng thành số cột và ngược lại.<br>\n-> Kích thước của $A^T$ là $(n \\times m)$.<br><br>\n<b>Bước 2: Quy tắc nhân ma trận</b><br>\n- Ta cần tính $A^T \\cdot B$.<br>\n- Ma trận thứ nhất $A^T$ có kích thước $(n \\times \\mathbf{m})$. Tức là có $m$ cột.<br>\n- Ma trận thứ hai $B$ có kích thước $(\\mathbf{p} \\times q)$. Tức là có $p$ hàng.<br>\n-> Để phép nhân hợp lệ, số cột của ma trận đứng trước phải BẰNG số hàng của ma trận đứng sau.<br>\n-> Do đó, ta bắt buộc phải có <b>$m = p$</b>.<br><br>\n=> <b>Đáp án đúng là $m = p$</b>."
     }
-]
 ];
