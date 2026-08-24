@@ -35,8 +35,11 @@ window.onload = () => {
 };
 
 function startExam() {
-    // Trộn ngẫu nhiên thứ tự câu hỏi
-    quizData.sort(() => Math.random() - 0.5);
+    // Trộn ngẫu nhiên thứ tự câu hỏi bằng thuật toán Fisher-Yates chuẩn xác
+    for (let i = quizData.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [quizData[i], quizData[j]] = [quizData[j], quizData[i]];
+    }
 
     elements.startScreen.classList.add('hidden');
     elements.quizContainer.classList.remove('hidden');
