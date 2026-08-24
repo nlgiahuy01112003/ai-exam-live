@@ -24,6 +24,9 @@ const elements = {
 };
 
 function startExam() {
+    // Trộn ngẫu nhiên danh sách câu hỏi mỗi khi bắt đầu bài thi
+    quizData.sort(() => Math.random() - 0.5);
+
     elements.startScreen.classList.add('hidden');
     elements.quizContainer.classList.remove('hidden');
     elements.timer.classList.remove('hidden');
