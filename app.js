@@ -4,6 +4,9 @@ let answered = false;
 let timeLeft = 45 * 60; // 45 phút
 let timerInterval;
 
+// Lưu trữ lịch sử trả lời để làm Report cuối giờ
+let userAnswers = [];
+
 const elements = {
     startScreen: document.getElementById('start-screen'),
     quizContainer: document.getElementById('quiz-container'),
@@ -41,6 +44,7 @@ function startExam() {
         [quizData[i], quizData[j]] = [quizData[j], quizData[i]];
     }
 
+    userAnswers = []; // Reset array lưu lịch sử
     elements.startScreen.classList.add('hidden');
     elements.quizContainer.classList.remove('hidden');
     elements.timer.classList.remove('hidden');
@@ -76,14 +80,12 @@ function loadQuestion() {
         elements.optCont.classList.remove('hidden');
         elements.essayCont.classList.add('hidden');
         
-        // [UX Tối ưu] Xáo trộn vị trí các đáp án A, B, C, D 
-        // Nhưng vẫn giữ nguyên logic trỏ về đáp án đúng
         let mappedOptions = q.options.map((opt, idx) => ({ text: opt, isCorrect: idx === q.correct }));
         mappedOptions.sort(() => Math.random() - 0.5); 
         q.shuffledOptions = mappedOptions;
 
         mappedOptions.forEach((opt, idx) => {
-            const letter = String.fromCharCode(65 + idx); // Chữ cái A, B, C, D
+            const letter = String.fromCharCode(65 + idx);
             elements.optCont.innerHTML += `
                 <label class="flex items-center p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 transition-all duration-200 option-label" id="label-${idx}">
                     <input type="radio" name="mcq" value="${idx}" class="w-5 h-5 text-blue-600 focus:ring-blue-500">
@@ -121,7 +123,18 @@ function checkAnswer() {
 
         if (isCorrect) score++;
 
-        // UI Feedback: Đổi màu đúng/sai cho các đáp án
+        // Lưu thông tin để phân tích cuối giờ
+        const correctChoice = q.shuffledOptions.find(o => o.isCorrect);
+        userAnswers.push({
+            qIndex: currentQuestion,
+            questionText: q.question,
+            category: q.category,
+            isCorrect: isCorrect,
+            userChoiceText: q.shuffledOptions[val].text,
+            correctChoiceText: correctChoice.text
+        });
+
+        // UI Feedback
         document.querySelectorAll('.option-label').forEach((lbl, idx) => {
             lbl.querySelector('input').disabled = true;
             lbl.classList.remove('hover:bg-blue-50', 'cursor-pointer');
@@ -167,7 +180,6 @@ function finishExam() {
     const mcqCount = quizData.filter(q => q.type === 'mcq').length;
     document.getElementById('score-display').innerText = `${score}/${mcqCount}`;
     
-    // [UX Tối ưu] Lưu điểm vào LocalStorage
     const prevHigh = localStorage.getItem('aiExamHighScore') || 0;
     if (score > prevHigh) {
         localStorage.setItem('aiExamHighScore', score);
@@ -179,27 +191,85 @@ function finishExam() {
     else if (percentage >= 0.8) msg = "Xuất sắc! Kiến thức của anh rất vững vàng! 🚀";
     else if (percentage >= 0.5) msg = "Khá tốt! Nhưng cần cẩn thận hơn ở các bẫy logic nhé!";
     else msg = "Hãy ôn tập kỹ lại theo đáp án giải thích nhé! 💪";
-    
     document.getElementById('score-message').innerText = msg;
+
+    generateAnalyticsReport();
+}
+
+// Hàm sinh Báo Cáo chi tiết
+function generateAnalyticsReport() {
+    const analysisCont = document.getElementById('category-analysis');
+    const detailsCont = document.getElementById('detailed-results');
+    
+    // 1. Phân tích Category (Radar)
+    const categoryStats = {};
+    userAnswers.forEach(ans => {
+        if (!categoryStats[ans.category]) {
+            categoryStats[ans.category] = { total: 0, correct: 0 };
+        }
+        categoryStats[ans.category].total++;
+        if (ans.isCorrect) categoryStats[ans.category].correct++;
+    });
+
+    for (const [cat, stats] of Object.entries(categoryStats)) {
+        const percent = Math.round((stats.correct / stats.total) * 100);
+        let colorClass = 'text-rose-500';
+        let barColor = 'bg-rose-500';
+        if (percent >= 80) { colorClass = 'text-emerald-600'; barColor = 'bg-emerald-500'; }
+        else if (percent >= 50) { colorClass = 'text-amber-500'; barColor = 'bg-amber-400'; }
+
+        analysisCont.innerHTML += `
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-100 shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-bold text-slate-700 text-sm">${cat}</span>
+                    <span class="font-black ${colorClass}">${stats.correct}/${stats.total} (${percent}%)</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-1.5">
+                    <div class="${barColor} h-1.5 rounded-full" style="width: ${percent}%"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 2. Chi tiết từng câu
+    userAnswers.forEach(ans => {
+        const isCorr = ans.isCorrect;
+        const icon = isCorr ? '<i class="fas fa-check-circle text-emerald-500 text-xl"></i>' : '<i class="fas fa-times-circle text-rose-500 text-xl"></i>';
+        const border = isCorr ? 'border-emerald-300 bg-emerald-50' : 'border-rose-300 bg-rose-50';
+        const userChoiceColor = isCorr ? 'text-emerald-700' : 'text-rose-700 line-through';
+        
+        let detailsHtml = `
+            <div class="p-4 border rounded-lg ${border} text-sm shadow-sm transition-all">
+                <div class="flex items-start justify-between mb-3">
+                    <span class="font-bold text-slate-800 pr-4">Câu ${ans.qIndex + 1}: ${ans.questionText}</span>
+                    <span class="shrink-0">${icon}</span>
+                </div>
+                <div class="mt-2 space-y-1">
+                    <div class="bg-white/50 p-2 rounded"><span class="font-semibold text-slate-600">Bạn chọn:</span> <span class="font-semibold ${userChoiceColor}">${ans.userChoiceText}</span></div>
+                    ${!isCorr ? `<div class="bg-white/50 p-2 rounded"><span class="font-semibold text-slate-600">Đáp án chuẩn:</span> <span class="font-bold text-emerald-600">${ans.correctChoiceText}</span></div>` : ''}
+                </div>
+            </div>
+        `;
+        detailsCont.innerHTML += detailsHtml;
+    });
+
+    // Render lại công thức toán MathJax cho phần Report
+    renderFormats();
 }
 
 function renderFormats() {
     if (window.MathJax) {
-        MathJax.typesetPromise([elements.quizContainer]).catch(err => console.log(err));
+        MathJax.typesetPromise([document.body]).catch(err => console.log(err));
     }
     document.querySelectorAll('pre code').forEach((el) => {
         hljs.highlightElement(el);
     });
 }
 
-// [UX Tối ưu] Thêm Keyboard Shortcuts (Phím tắt) để thi cực nhanh
+// Bắt sự kiện phím tắt
 document.addEventListener('keydown', (e) => {
-    // Chỉ kích hoạt khi đang ở màn hình làm bài
     if (elements.quizContainer.classList.contains('hidden')) return;
-
     const key = e.key.toLowerCase();
-    
-    // Nhấn 1,2,3,4 hoặc a,b,c,d để tick chọn nhanh đáp án
     const optionMap = {'1': 0, '2': 1, '3': 2, '4': 3, 'a': 0, 'b': 1, 'c': 2, 'd': 3};
     if (optionMap[key] !== undefined && !answered) {
         const radios = document.querySelectorAll('input[name="mcq"]');
@@ -207,15 +277,9 @@ document.addEventListener('keydown', (e) => {
             radios[optionMap[key]].checked = true;
         }
     }
-    
-    // Nhấn Enter để thực hiện hành động chính
     if (key === 'enter') {
-        if (!answered && !elements.btnCheck.classList.contains('hidden')) {
-            checkAnswer();
-        } else if (answered && !elements.btnNext.classList.contains('hidden')) {
-            nextQuestion();
-        } else if (answered && !elements.btnFinish.classList.contains('hidden')) {
-            finishExam();
-        }
+        if (!answered && !elements.btnCheck.classList.contains('hidden')) checkAnswer();
+        else if (answered && !elements.btnNext.classList.contains('hidden')) nextQuestion();
+        else if (answered && !elements.btnFinish.classList.contains('hidden')) finishExam();
     }
 });
