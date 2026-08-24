@@ -6,11 +6,32 @@
     <title>Hệ thống Thi thử AI Thực chiến - VinUni</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for LaTeX Math Formatting -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: { typeset: false } // We manually typeset after DOM updates
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <!-- Highlight.js for Code Formatting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
     <style>
-        .code-block { font-family: 'Courier New', Courier, monospace; background-color: #f3f4f6; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.9em; color: #e11d48; }
-        .pre-block { background-color: #1e293b; color: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .code-block { font-family: 'Fira Code', 'Courier New', Courier, monospace; background-color: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.9em; color: #e11d48; }
+        .pre-block { background-color: #0d1117; color: #c9d1d9; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: 'Fira Code', 'Courier New', Courier, monospace; font-size: 0.9em; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Cân chỉnh MathJax */
+        .MathJax { font-size: 1.1em !important; }
+        code { color: #db2777; background-color: #fce7f3; padding: 2px 4px; border-radius: 4px; font-family: monospace; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800">
@@ -19,11 +40,10 @@
     <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
             <div>
-                <h1 class="text-xl font-bold"><i class="fas fa-brain mr-2"></i>AI Mock Exam - VinUni</h1>
-                <p class="text-sm text-blue-200">Mô phỏng Đánh giá Năng lực (SFIA Level 3-4)</p>
+                <h1 class="text-xl font-bold"><i class="fas fa-brain mr-2"></i>AI Mock Exam - VinUni (SFIA Level 3-4)</h1>
             </div>
             <div id="timer" class="text-2xl font-mono font-semibold bg-blue-800 px-4 py-2 rounded-lg hidden">
-                90:00
+                45:00
             </div>
         </div>
     </header>
@@ -34,23 +54,11 @@
         <!-- Start Screen -->
         <div id="start-screen" class="bg-white rounded-xl shadow-sm p-8 text-center border border-slate-200 fade-in">
             <i class="fas fa-laptop-code text-6xl text-blue-600 mb-6"></i>
-            <h2 class="text-3xl font-bold mb-4">Sẵn sàng làm bài thi thử?</h2>
+            <h2 class="text-3xl font-bold mb-4">Bài Thi Đánh Giá Năng Lực AI Chuyên Sâu</h2>
             <p class="text-slate-600 mb-6 max-w-2xl mx-auto">
-                Bài thi thử nghiệm gồm các câu hỏi trắc nghiệm và tự luận (viết code chay) được trích xuất từ bộ 50 câu chuẩn SFIA Level 3-4. Bạn sẽ có thời gian giới hạn để hoàn thành. Hãy tập trung cao độ!
+                Bài kiểm tra này tập trung vào <strong>Tư duy Toán học, Lập trình Data (Pandas/NumPy)</strong> và <strong>Kiến trúc Mô hình Machine Learning</strong>. Toàn bộ công thức toán học và mã nguồn đã được định dạng chuẩn xác nhất.
             </p>
-            
-            <div class="grid grid-cols-2 gap-4 max-w-md mx-auto mb-8 text-left">
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                    <div class="font-bold text-blue-900"><i class="fas fa-list-ol mr-2"></i>Số lượng</div>
-                    <div class="text-blue-700">15 Câu hỏi chọn lọc</div>
-                </div>
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                    <div class="font-bold text-blue-900"><i class="fas fa-stopwatch mr-2"></i>Thời gian</div>
-                    <div class="text-blue-700">30 Phút</div>
-                </div>
-            </div>
-
-            <button onclick="startExam()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+            <button onclick="startExam()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:-translate-y-1">
                 BẮT ĐẦU THI NGAY <i class="fas fa-arrow-right ml-2"></i>
             </button>
         </div>
@@ -61,7 +69,7 @@
             <!-- Progress Bar -->
             <div class="mb-6">
                 <div class="flex justify-between text-sm font-semibold text-slate-600 mb-2">
-                    <span id="progress-text">Câu hỏi 1 / 15</span>
+                    <span id="progress-text">Câu hỏi 1</span>
                     <span>Tiến độ</span>
                 </div>
                 <div class="w-full bg-slate-200 rounded-full h-2.5">
@@ -71,38 +79,36 @@
 
             <!-- Question Card -->
             <div class="bg-white rounded-xl shadow-sm p-8 border border-slate-200 fade-in relative">
-                <span id="question-badge" class="absolute -top-3 -left-3 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">Toán & Thống kê</span>
+                <span id="question-badge" class="absolute -top-3 -left-3 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">Toán</span>
                 
                 <h3 id="question-text" class="text-xl font-semibold mb-6 mt-2 leading-relaxed">Đang tải câu hỏi...</h3>
                 
-                <!-- Options Container -->
-                <div id="options-container" class="space-y-3">
-                    <!-- Options will be injected here via JS -->
-                </div>
+                <!-- Options -->
+                <div id="options-container" class="space-y-3"></div>
 
-                <!-- Essay/Code Container -->
+                <!-- Essay Input -->
                 <div id="essay-container" class="hidden mt-4">
-                    <p class="text-sm text-slate-500 mb-2"><i class="fas fa-keyboard mr-1"></i>Viết mã nguồn (code chay) hoặc câu trả lời của bạn vào đây:</p>
-                    <textarea id="essay-input" rows="4" class="w-full p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm" placeholder="Nhập câu trả lời..."></textarea>
+                    <p class="text-sm text-slate-500 mb-2"><i class="fas fa-keyboard mr-1"></i>Viết mã nguồn hoặc câu trả lời (Code chay):</p>
+                    <textarea id="essay-input" rows="4" class="w-full p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Nhập code Python/Pandas..."></textarea>
                 </div>
 
-                <!-- Action Buttons -->
+                <!-- Actions -->
                 <div class="mt-8 flex justify-between items-center border-t border-slate-100 pt-6">
                     <button id="btn-check" onclick="checkAnswer()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
                         <i class="fas fa-check mr-2"></i>Kiểm tra đáp án
                     </button>
-                    <button id="btn-next" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors hidden">
+                    <button id="btn-next" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg hidden transition-colors">
                         Câu tiếp theo <i class="fas fa-arrow-right ml-2"></i>
                     </button>
-                    <button id="btn-finish" onclick="finishExam()" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors hidden">
+                    <button id="btn-finish" onclick="finishExam()" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-6 rounded-lg hidden transition-colors">
                         <i class="fas fa-flag-checkered mr-2"></i>Nộp bài
                     </button>
                 </div>
 
-                <!-- Explanation Area -->
+                <!-- Explanation -->
                 <div id="explanation-container" class="mt-6 bg-slate-50 border-l-4 border-emerald-500 p-4 rounded-r-lg hidden fade-in">
                     <h4 class="font-bold text-emerald-800 mb-2"><i class="fas fa-lightbulb mr-2"></i>Giải thích / Đáp án chuẩn:</h4>
-                    <div id="explanation-text" class="text-slate-700 text-sm leading-relaxed"></div>
+                    <div id="explanation-text" class="text-slate-800 text-sm leading-relaxed"></div>
                 </div>
             </div>
         </div>
@@ -111,273 +117,17 @@
         <div id="result-screen" class="hidden bg-white rounded-xl shadow-sm p-8 text-center border border-slate-200 fade-in">
             <i class="fas fa-trophy text-6xl text-amber-500 mb-6"></i>
             <h2 class="text-3xl font-bold mb-2">Hoàn thành bài thi!</h2>
-            <p class="text-slate-600 mb-8">Dưới đây là kết quả của bạn cho phần trắc nghiệm.</p>
-            
             <div class="text-6xl font-black text-blue-600 mb-4" id="score-display">0/0</div>
-            <p class="text-lg font-semibold text-slate-700 mb-8" id="score-message">Làm tốt lắm!</p>
-
-            <div class="bg-blue-50 text-blue-800 p-4 rounded-lg mb-8 text-left text-sm max-w-lg mx-auto">
-                <i class="fas fa-info-circle mr-2"></i>Phần thi tự luận/viết code cần được đối chiếu trực tiếp với đáp án chuẩn trong phần giải thích để tự chấm điểm.
-            </div>
-
-            <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-lg transition-colors">
-                <i class="fas fa-redo mr-2"></i>Thử lại từ đầu
+            <p class="text-lg font-semibold text-slate-700 mb-8" id="score-message"></p>
+            <button onclick="location.reload()" class="bg-slate-800 text-white font-bold py-3 px-8 rounded-lg">
+                <i class="fas fa-redo mr-2"></i>Làm lại bài thi
             </button>
         </div>
 
     </main>
 
-    <script>
-        // Database of Questions
-        const quizData = [
-            {
-                type: 'mcq',
-                category: 'Toán & Thống kê',
-                question: 'Một xét nghiệm AI phát hiện bệnh có độ chính xác P(+|Bệnh)=0.98 và tỷ lệ dương tính giả P(+|Không bệnh)=0.02. Tỷ lệ mắc bệnh trong cộng đồng là 1%. Người có kết quả Dương tính thì xác suất thực sự mắc bệnh là bao nhiêu?',
-                options: ['98.00%', '50.00%', '33.11%', '2.00%'],
-                correct: 2,
-                explanation: 'Áp dụng định lý Bayes: P(Bệnh|+) = [P(+|Bệnh) * P(Bệnh)] / [P(+|Bệnh)*P(Bệnh) + P(+|Không bệnh)*P(Không bệnh)] = (0.98 * 0.01) / ((0.98 * 0.01) + (0.02 * 0.99)) = 0.0098 / 0.0296 ≈ 0.3311 (33.11%).'
-            },
-            {
-                type: 'mcq',
-                category: 'Đại số tuyến tính',
-                question: 'Cho 3 ma trận A (4x5), B (5x3), C (3x4). Phép nhân ma trận X = (A * B) * C trả về ma trận có kích thước là?',
-                options: ['(4, 4)', '(5, 5)', '(4, 3)', 'Không thực hiện được'],
-                correct: 0,
-                explanation: 'A(4x5) * B(5x3) tạo ra ma trận AB(4x3). Tiếp tục lấy AB(4x3) * C(3x4) sẽ tạo ra ma trận X kích thước (4,4).'
-            },
-            {
-                type: 'mcq',
-                category: 'Lập trình Python',
-                question: 'Đoạn code sau in ra kết quả gì?<br><div class="pre-block mt-2">def add_item(item, box=[]):<br>&nbsp;&nbsp;&nbsp;&nbsp;box.append(item)<br>&nbsp;&nbsp;&nbsp;&nbsp;return box<br><br>print(add_item(1))<br>print(add_item(2))</div>',
-                options: ['[1] và [2]', '[1] và [1, 2]', '[1, 2] và [1, 2]', 'Báo lỗi TypeError'],
-                correct: 1,
-                explanation: 'Trong Python, tham số mặc định dạng mutable (như list) chỉ được khởi tạo một lần khi định nghĩa hàm. Lần gọi 1 box thành [1]. Lần gọi 2 box giữ nguyên tham chiếu cũ nên thêm 2 thành [1, 2].'
-            },
-            {
-                type: 'mcq',
-                category: 'Thư viện Pandas',
-                question: 'Cho DataFrame `df = pd.DataFrame({"Value": [10, 20, 30, 40]}, index=[2, 3, 0, 1])`. Kết quả của `df.loc[0]` và `df.iloc[0]` lần lượt trả về giá trị nào?',
-                options: ['10 và 10', '30 và 10', '10 và 30', 'Báo lỗi KeyError'],
-                correct: 1,
-                explanation: 'df.loc[0] tìm dòng có nhãn (index label) là 0 -> giá trị 30. df.iloc[0] tìm dòng ở vị trí vật lý đầu tiên (index position 0) -> giá trị 10.'
-            },
-            {
-                type: 'mcq',
-                category: 'Kiến thức Machine Learning',
-                question: 'Trong bài toán phát hiện gian lận ngân hàng: "Thà báo nhầm giao dịch hợp lệ còn hơn bỏ sót giao dịch gian lận". Nên tối ưu metric nào?',
-                options: ['Accuracy', 'Precision', 'Recall', 'Specificity'],
-                correct: 2,
-                explanation: 'Recall (Độ phủ) đo lường tỉ lệ phát hiện được (TP / (TP + FN)). Bỏ sót gian lận nghĩa là FN tăng. Tối ưu Recall giúp giảm thiểu FN (số ca bỏ sót).'
-            },
-            {
-                type: 'mcq',
-                category: 'Kiến thức Deep Learning',
-                question: 'Khi Loss vọt lên `NaN` trong quá trình huấn luyện Deep Learning, đây là biểu hiện phổ biến của hiện tượng gì?',
-                options: ['Data Leakage', 'Exploding Gradient', 'Vanishing Gradient', 'Underfitting'],
-                correct: 1,
-                explanation: 'Exploding Gradient làm cho các đạo hàm trở nên quá lớn, khiến trọng số được cập nhật vọt qua giới hạn số học (overflow) và sinh ra lỗi NaN. Cách khắc phục: Giảm Learning Rate hoặc dùng Gradient Clipping.'
-            },
-            {
-                type: 'essay',
-                category: 'Code Chay Pandas',
-                question: 'Cho DataFrame `df` có cột `["Name", "Salary", "Department"]`. <br>Viết 1 dòng code duy nhất dùng `.transform()` để điền các giá trị NaN trong cột `Salary` bằng giá trị Median của từng phòng ban (`Department`).',
-                options: [],
-                correct: -1,
-                explanation: '<div class="pre-block">df["Salary"] = df.groupby("Department")["Salary"].transform(lambda x: x.fillna(x.median()))</div>Giải thích: .transform() giữ nguyên số lượng dòng ban đầu của df, rất phù hợp để fillna dựa trên giá trị tính toán từ groupby.'
-            },
-            {
-                type: 'mcq',
-                category: 'Đạo đức AI & Data',
-                question: 'AI lọc hồ sơ tự động thiên vị Nam giới do dữ liệu quá khứ 90% người trúng tuyển là Nam. Giải pháp gốc rễ để xử lý Bias này là gì?',
-                options: ['Bỏ thuật toán, chuyển về tuyển thủ công.', 'Tái cân bằng tập dữ liệu và loại bỏ biến Gender khỏi đầu vào.', 'Cộng thêm điểm cho ứng viên nữ ở bước dự đoán cuối.', 'Xóa bớt dữ liệu nam để tỷ lệ là 1:1, dù dữ liệu nam còn lại cực kỳ ít.'],
-                correct: 1,
-                explanation: 'Bias do dữ liệu lịch sử (Historical Bias) cần được giải quyết ở khâu chuẩn bị dữ liệu (Data-centric). Việc tái cân bằng (Oversampling/Undersampling kết hợp dữ liệu tổng hợp) và bỏ đi thuộc tính nhạy cảm (Gender) là giải pháp tiêu chuẩn.'
-            },
-            {
-                type: 'essay',
-                category: 'Tình huống MLOps',
-                question: 'Vì sao việc dùng `StandardScaler` (để tính mean, std) trên TOÀN BỘ dữ liệu gốc, rồi sau đó mới chia `train_test_split` lại bị coi là sai quy trình và gây ra hiện tượng Data Leakage?',
-                options: [],
-                correct: -1,
-                explanation: 'Vì khi chuẩn hóa toàn bộ dữ liệu, thông tin thống kê (mean, variance) của tập Test đã rò rỉ (leak) vào tập Train. Mô hình vô tình "nhìn trộm" được phân phối của tập Test. <br><br><b>Trình tự đúng:</b> Chia train_test_split trước -> scaler.fit(Train) -> scaler.transform(Train) -> scaler.transform(Test).'
-            },
-            {
-                type: 'mcq',
-                category: 'Thuật toán Machine Learning',
-                question: 'Cơ chế "Bagging" trong thuật toán Random Forest có nghĩa là gì?',
-                options: ['Huấn luyện các cây tuần tự, cây sau sửa lỗi cây trước.', 'Huấn luyện nhiều cây độc lập trên các tập mẫu dữ liệu con được lấy ngẫu nhiên có hoàn lại (Bootstrap), rồi bầu chọn kết quả (Voting/Averaging).', 'Gom cụm các cây có chung đặc điểm.', 'Loại bỏ các đặc trưng (features) không quan trọng trước khi đưa vào cây.'],
-                correct: 1,
-                explanation: 'Bagging = Bootstrap Aggregating. Nghĩa là tạo ra nhiều tập dữ liệu con (có hoàn lại) từ tập gốc, huấn luyện song song nhiều cây quyết định, sau đó tổng hợp kết quả (Voting hoặc Trung bình) để giảm phương sai (Variance), chống Overfitting.'
-            }
-        ];
-
-        let currentQuestion = 0;
-        let score = 0;
-        let answered = false;
-        let timeLeft = 30 * 60; // 30 minutes
-        let timerInterval;
-
-        // Elements
-        const screens = {
-            start: document.getElementById('start-screen'),
-            quiz: document.getElementById('quiz-container'),
-            result: document.getElementById('result-screen')
-        };
-        const elements = {
-            questionBadge: document.getElementById('question-badge'),
-            questionText: document.getElementById('question-text'),
-            optionsContainer: document.getElementById('options-container'),
-            essayContainer: document.getElementById('essay-container'),
-            essayInput: document.getElementById('essay-input'),
-            btnCheck: document.getElementById('btn-check'),
-            btnNext: document.getElementById('btn-next'),
-            btnFinish: document.getElementById('btn-finish'),
-            explanationContainer: document.getElementById('explanation-container'),
-            explanationText: document.getElementById('explanation-text'),
-            progressBar: document.getElementById('progress-bar'),
-            progressText: document.getElementById('progress-text'),
-            timer: document.getElementById('timer')
-        };
-
-        function startExam() {
-            screens.start.classList.add('hidden');
-            screens.quiz.classList.remove('hidden');
-            elements.timer.classList.remove('hidden');
-            startTimer();
-            loadQuestion();
-        }
-
-        function startTimer() {
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-                const seconds = (timeLeft % 60).toString().padStart(2, '0');
-                elements.timer.innerText = `${minutes}:${seconds}`;
-                
-                if(timeLeft <= 300) elements.timer.classList.add('text-red-300', 'bg-red-900'); // Last 5 mins
-                if(timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    finishExam();
-                }
-            }, 1000);
-        }
-
-        function loadQuestion() {
-            answered = false;
-            const q = quizData[currentQuestion];
-            
-            // UI Reset
-            elements.explanationContainer.classList.add('hidden');
-            elements.btnCheck.classList.remove('hidden');
-            elements.btnNext.classList.add('hidden');
-            elements.optionsContainer.innerHTML = '';
-            
-            // Progress
-            elements.progressText.innerText = `Câu hỏi ${currentQuestion + 1} / ${quizData.length}`;
-            elements.progressBar.style.width = `${((currentQuestion) / quizData.length) * 100}%`;
-            
-            // Question info
-            elements.questionBadge.innerText = q.category;
-            elements.questionText.innerHTML = q.question;
-
-            if (q.type === 'mcq') {
-                elements.optionsContainer.classList.remove('hidden');
-                elements.essayContainer.classList.add('hidden');
-                
-                q.options.forEach((opt, index) => {
-                    const optHtml = `
-                        <label class="flex items-center p-4 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors option-label" id="label-${index}">
-                            <input type="radio" name="mcq-option" value="${index}" class="w-5 h-5 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-3 font-medium text-slate-700">${opt}</span>
-                        </label>
-                    `;
-                    elements.optionsContainer.insertAdjacentHTML('beforeend', optHtml);
-                });
-            } else {
-                elements.optionsContainer.classList.add('hidden');
-                elements.essayContainer.classList.remove('hidden');
-                elements.essayInput.value = '';
-                elements.btnCheck.innerHTML = '<i class="fas fa-eye mr-2"></i>Xem đáp án chuẩn';
-            }
-
-            if(currentQuestion === quizData.length - 1) {
-                elements.btnNext.classList.add('hidden');
-            }
-        }
-
-        function checkAnswer() {
-            if (answered) return;
-            const q = quizData[currentQuestion];
-            
-            if (q.type === 'mcq') {
-                const selected = document.querySelector('input[name="mcq-option"]:checked');
-                if (!selected) {
-                    alert('Vui lòng chọn một đáp án!');
-                    return;
-                }
-                
-                const selectedVal = parseInt(selected.value);
-                const isCorrect = (selectedVal === q.correct);
-                
-                if (isCorrect) score++;
-
-                // Style all options
-                document.querySelectorAll('.option-label').forEach((lbl, idx) => {
-                    const radio = lbl.querySelector('input');
-                    radio.disabled = true;
-                    if (idx === q.correct) {
-                        lbl.classList.remove('border-slate-200');
-                        lbl.classList.add('border-emerald-500', 'bg-emerald-50');
-                        lbl.innerHTML += '<i class="fas fa-check-circle text-emerald-500 ml-auto text-xl"></i>';
-                    } else if (idx === selectedVal && !isCorrect) {
-                        lbl.classList.remove('border-slate-200');
-                        lbl.classList.add('border-rose-500', 'bg-rose-50');
-                        lbl.innerHTML += '<i class="fas fa-times-circle text-rose-500 ml-auto text-xl"></i>';
-                    }
-                });
-            } else {
-                elements.essayInput.disabled = true;
-            }
-
-            // Show explanation
-            elements.explanationText.innerHTML = q.explanation;
-            elements.explanationContainer.classList.remove('hidden');
-            
-            // Buttons toggle
-            elements.btnCheck.classList.add('hidden');
-            if (currentQuestion < quizData.length - 1) {
-                elements.btnNext.classList.remove('hidden');
-            } else {
-                elements.btnFinish.classList.remove('hidden');
-            }
-            
-            answered = true;
-        }
-
-        function nextQuestion() {
-            currentQuestion++;
-            loadQuestion();
-        }
-
-        function finishExam() {
-            clearInterval(timerInterval);
-            screens.quiz.classList.add('hidden');
-            screens.result.classList.remove('hidden');
-            
-            // Count total MCQs
-            const mcqCount = quizData.filter(q => q.type === 'mcq').length;
-            
-            document.getElementById('score-display').innerText = `${score}/${mcqCount}`;
-            
-            let message = '';
-            const percentage = score / mcqCount;
-            if(percentage === 1) message = 'Xuất sắc! Bạn nắm cực kỳ vững kiến thức.';
-            else if(percentage >= 0.7) message = 'Khá tốt! Bạn đã có nền tảng vững vàng.';
-            else message = 'Cần ôn tập kỹ hơn các khái niệm trọng tâm!';
-            
-            document.getElementById('score-message').innerText = message;
-        }
-    </script>
+    <!-- Import Data -->
+    <script src="data.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
