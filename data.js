@@ -418,4 +418,33 @@ const quizData = [
     { type: "essay", category: "Thư viện Pandas", question: "Viết lệnh Pandas tạo một cột mới tên là <code>'Age_Group'</code>, với điều kiện: Nếu cột <code>df['Age'] >= 18</code> là 'Adult', ngược lại là 'Child'.", options: [], correct: -1, explanation: "<b>Mã nguồn chuẩn:</b><br>Sử dụng NumPy:<br><code>df['Age_Group'] = np.where(df['Age'] >= 18, 'Adult', 'Child')</code>" },
     { type: "essay", category: "Machine Learning (Scikit-Learn)", question: "Viết lệnh để chia tập dữ liệu <code>X, y</code> thành tập Huấn luyện (Train) 80% và tập Kiểm thử (Test) 20% bằng <code>train_test_split</code>, đồng thời khóa state ngẫu nhiên bằng 42.", options: [], correct: -1, explanation: "<b>Mã nguồn chuẩn:</b><br><code>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</code>" }
 
+,
+
+    {
+        "type": "mcq",
+        "category": "Đại số tuyến tính (Toán học)",
+        "question": "Cho 3 ma trận $A \\in \\mathbb{R}^{4 \\times 5}$, $B \\in \\mathbb{R}^{5 \\times 3}$, và $C \\in \\mathbb{R}^{3 \\times 4}$. Phép nhân ma trận $X = (A \\cdot B) \\cdot C$ sẽ trả về ma trận $X$ có kích thước (shape) là bao nhiêu?",
+        "options": [
+            "$4 \\times 3$",
+            "$4 \\times 4$",
+            "$5 \\times 4$",
+            "$3 \\times 3$"
+        ],
+        "correct": 1,
+        "explanation": "<b>Giải thích chi tiết từng bước:</b><br>\nQuy tắc nhân 2 ma trận: Nếu ma trận $M$ có kích thước $(m \\times n)$ và ma trận $N$ có kích thước $(n \\times p)$, thì phép nhân $M \\cdot N$ hợp lệ (do số cột $M$ = số hàng $N$) và trả về ma trận mới có kích thước $(m \\times p)$.<br><br>\n<b>Bước 1: Tính ma trận $Y = A \\cdot B$</b><br>\n- Ma trận $A$ có kích thước $4 \\times 5$ (4 hàng, 5 cột).<br>\n- Ma trận $B$ có kích thước $5 \\times 3$ (5 hàng, 3 cột).<br>\n-> Số cột của $A$ (5) bằng số hàng của $B$ (5). Vậy $Y = A \\cdot B$ hợp lệ.<br>\n-> Kích thước của $Y$ sẽ lấy số hàng của $A$ và số cột của $B$, tức là $4 \\times 3$.<br><br>\n<b>Bước 2: Tính ma trận $X = Y \\cdot C$</b><br>\n- Ma trận $Y$ vừa tính có kích thước $4 \\times 3$.<br>\n- Ma trận $C$ có kích thước $3 \\times 4$.<br>\n-> Số cột của $Y$ (3) bằng số hàng của $C$ (3). Vậy phép nhân hợp lệ.<br>\n-> Kích thước của $X$ sẽ lấy số hàng của $Y$ và số cột của $C$, tức là <b>$4 \\times 4$</b>.<br><br>\n=> <b>Đáp án đúng là $4 \\times 4$</b>."
+    },
+    {
+        "type": "mcq",
+        "category": "Đại số tuyến tính (Toán học)",
+        "question": "Cho ma trận $A$ kích thước $(m \\times n)$ và ma trận $B$ kích thước $(p \\times q)$. Điều kiện nào sau đây bắt buộc phải thỏa mãn để phép nhân $A^T \\cdot B$ hợp lệ? ($A^T$ là ma trận chuyển vị của $A$).",
+        "options": [
+            "$m = p$",
+            "$n = p$",
+            "$m = q$",
+            "$n = q$"
+        ],
+        "correct": 0,
+        "explanation": "<b>Giải thích chi tiết:</b><br>\n<b>Bước 1: Kích thước của ma trận chuyển vị $A^T$</b><br>\n- $A$ có kích thước $(m \\times n)$. Khi chuyển vị, số hàng thành số cột và ngược lại.<br>\n-> Kích thước của $A^T$ là $(n \\times m)$.<br><br>\n<b>Bước 2: Quy tắc nhân ma trận</b><br>\n- Ta cần tính $A^T \\cdot B$.<br>\n- Ma trận thứ nhất $A^T$ có kích thước $(n \\times \\mathbf{m})$. Tức là có $m$ cột.<br>\n- Ma trận thứ hai $B$ có kích thước $(\\mathbf{p} \\times q)$. Tức là có $p$ hàng.<br>\n-> Để phép nhân hợp lệ, số cột của ma trận đứng trước phải BẰNG số hàng của ma trận đứng sau.<br>\n-> Do đó, ta bắt buộc phải có <b>$m = p$</b>.<br><br>\n=> <b>Đáp án đúng là $m = p$</b>."
+    }
+]
 ];
