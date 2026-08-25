@@ -175,18 +175,40 @@ Yêu cầu:
 2. Nhận xét ngắn gọn điểm đúng và sai.
 3. Trình bày bằng tiếng Việt, dùng Markdown.`;
 
-        fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        })
-        .then(res => res.json())
-        .then(data => {
-            let aiFeedback = "Không nhận được phản hồi từ AI.";
-            if (data.candidates && data.candidates[0].content) {
-                aiFeedback = data.candidates[0].content.parts[0].text;
+        const callAIWithRetry = async (promptText, retries = 3) => {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-goog-api-key': GEMINI_API_KEY
+                        },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+                    });
+                    const data = await response.json();
+                    if (data.error) {
+                        console.warn(`Lỗi AI (Lần ${i+1}):`, data.error.message);
+                        if (i === retries - 1) throw new Error(data.error.message);
+                        elements.btnCheck.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Mạng bận, đang thử lại lần ${i+2}...`;
+                        await new Promise(r => setTimeout(r, 2500)); // Đợi 2.5s rồi thử lại
+                        continue;
+                    }
+                    if (data.candidates && data.candidates[0].content) {
+                        return data.candidates[0].content.parts[0].text;
+                    }
+                    throw new Error("API không trả về nội dung");
+                } catch (e) {
+                    console.warn(`Lỗi mạng (Lần ${i+1}):`, e.message);
+                    if (i === retries - 1) throw e;
+                    elements.btnCheck.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Mạng bận, đang thử lại lần ${i+2}...`;
+                    await new Promise(r => setTimeout(r, 2500));
+                }
             }
-            
+        };
+
+        callAIWithRetry(prompt)
+        .then(aiFeedback => {
             elements.expText.innerHTML = `
                 <div class="mb-4 p-5 bg-indigo-50 border-l-4 border-indigo-500 rounded shadow-sm text-left">
                     <div class="font-black text-indigo-700 mb-2"><i class="fas fa-robot mr-2"></i>AI Giám Khảo Chấm Điểm:</div>
@@ -206,9 +228,9 @@ Yêu cầu:
             finalizeAnswer();
         })
         .catch(err => {
-            console.error(err);
+            console.error("Lỗi AI sau 3 lần thử:", err);
             elements.expText.innerHTML = `
-                <div class="text-rose-600 font-bold mb-2"><i class="fas fa-exclamation-triangle"></i> Lỗi kết nối API AI. Hiện đáp án gốc:</div>
+                <div class="text-rose-600 font-bold mb-2"><i class="fas fa-exclamation-triangle"></i> AI đang quá tải (Rate Limit). Hệ thống xin phép hiện đáp án gốc:</div>
                 <div class="text-left">${q.explanation}</div>
             `;
             finalizeAnswer();
