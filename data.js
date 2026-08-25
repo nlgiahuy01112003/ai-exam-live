@@ -446,4 +446,657 @@ const quizData = [
         "correct": 0,
         "explanation": "<b>Giải thích chi tiết:</b><br>\n<b>Bước 1: Kích thước của ma trận chuyển vị $A^T$</b><br>\n- $A$ có kích thước $(m \\times n)$. Khi chuyển vị, số hàng thành số cột và ngược lại.<br>\n-> Kích thước của $A^T$ là $(n \\times m)$.<br><br>\n<b>Bước 2: Quy tắc nhân ma trận</b><br>\n- Ta cần tính $A^T \\cdot B$.<br>\n- Ma trận thứ nhất $A^T$ có kích thước $(n \\times \\mathbf{m})$. Tức là có $m$ cột.<br>\n- Ma trận thứ hai $B$ có kích thước $(\\mathbf{p} \\times q)$. Tức là có $p$ hàng.<br>\n-> Để phép nhân hợp lệ, số cột của ma trận đứng trước phải BẰNG số hàng của ma trận đứng sau.<br>\n-> Do đó, ta bắt buộc phải có <b>$m = p$</b>.<br><br>\n=> <b>Đáp án đúng là $m = p$</b>."
     }
+,
+
+    {
+        "type": "mcq",
+        "category": "Transformer & Self-attention",
+        "question": "In the standard Scaled Dot-Product Attention $\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right)V$, assuming the components of $Q$ and $K$ are independent random variables with mean 0 and variance 1, what is the variance of the dot product $q \\cdot k$ before scaling, and why is the scaling factor $\\frac{1}{\\sqrt{d_k}}$ necessary?",
+        "options": [
+            "Variance is $d_k$; scaling by $\\frac{1}{\\sqrt{d_k}}$ ensures the variance of the dot product remains $d_k$, preventing gradient explosion.",
+            "Variance is $d_k$; scaling by $\\frac{1}{\\sqrt{d_k}}$ reduces the variance to 1, preventing the softmax function from entering regions with extremely small gradients.",
+            "Variance is $1$; scaling by $\\frac{1}{\\sqrt{d_k}}$ is purely empirical to speed up convergence during early training steps.",
+            "Variance is $d_k^2$; scaling by $\\frac{1}{\\sqrt{d_k}}$ normalizes the maximum possible value of the attention logit to 1."
+        ],
+        "correct": 1,
+        "explanation": "If components of $q$ and $k$ have mean 0 and variance 1, their dot product $q \\cdot k = \\sum_{i=1}^{d_k} q_i k_i$ has a mean of 0 and a variance of $d_k$. Without scaling, large $d_k$ pushes the softmax function into regions where gradients are vanishingly small. Dividing by $\\sqrt{d_k}$ standardizes the variance back to 1."
+    },
+    {
+        "type": "mcq",
+        "category": "Transformer & Self-attention",
+        "question": "Which of the following best describes the exact mechanism by which FlashAttention achieves memory efficiency and faster training compared to standard self-attention?",
+        "options": [
+            "It completely eliminates the softmax operation and uses a linear approximation of attention, reducing complexity to $\\mathcal{O}(N)$.",
+            "It computes the full attention matrix $QK^T$ in High Bandwidth Memory (HBM) but uses quantization (INT8) to reduce its memory footprint.",
+            "It uses tiling to compute attention block-by-block in SRAM, avoiding the materialization of the large $N \\times N$ attention matrix in HBM.",
+            "It downsamples the sequence length $N$ using a pooling layer before computing attention, halving the memory requirement."
+        ],
+        "correct": 2,
+        "explanation": "FlashAttention uses tiling to load blocks of Q, K, and V from HBM to SRAM, computes attention incrementally, and writes the output back. This avoids materializing the $\\mathcal{O}(N^2)$ attention matrix in HBM, reducing memory reads/writes and significantly speeding up the process."
+    },
+    {
+        "type": "mcq",
+        "category": "Transformer & Self-attention",
+        "question": "During autoregressive decoding in a Transformer model, the KV-cache is used to avoid redundant computations. For a batch size of $B$, sequence length $L$, $H$ attention heads, and head dimension $d_k$, what is the total number of elements stored in the KV-cache per layer?",
+        "options": [
+            "$B \\times L \\times H \\times d_k$",
+            "$2 \\times B \\times L \\times H \\times d_k$",
+            "$B \\times L^2 \\times H \\times d_k$",
+            "$2 \\times B \\times L^2 \\times H \\times d_k$"
+        ],
+        "correct": 1,
+        "explanation": "The KV-cache stores both the Key (K) and Value (V) tensors for all previous tokens in the sequence. Each tensor has a shape of $(B, L, H, d_k)$. Since there are two tensors (K and V), the total number of elements is $2 \\times B \\times L \\times H \\times d_k$."
+    },
+    {
+        "type": "mcq",
+        "category": "Transformer & Self-attention",
+        "question": "In Multi-Head Attention, the model splits the embedding dimension $d_{model}$ into $H$ heads, such that $d_k = d_{model} / H$. What is the primary representational advantage of this approach over using a Single-Head Attention with the full dimension $d_{model}$?",
+        "options": [
+            "It reduces the overall computational complexity from $\\mathcal{O}(N^2 \\cdot d_{model})$ to $\\mathcal{O}(N^2 \\cdot d_{model} / H)$.",
+            "It allows the model to jointly attend to information from different representation subspaces at different positions.",
+            "It prevents the attention matrix from becoming singular, ensuring stable gradients during backpropagation.",
+            "It mathematically guarantees that the attention weights form a symmetric matrix."
+        ],
+        "correct": 1,
+        "explanation": "Multi-Head Attention allows the model to project queries, keys, and values into $H$ different representation subspaces. This enables the model to simultaneously focus on different types of relationships (e.g., syntactic vs. semantic) between tokens at different positions, which a single head might average out."
+    },
+    {
+        "type": "mcq",
+        "category": "Transformer & Self-attention",
+        "question": "Which of the following statements correctly distinguishes Rotary Positional Embedding (RoPE) from absolute sinusoidal positional encodings?",
+        "options": [
+            "RoPE adds the positional information directly to the input embeddings before the first Transformer layer.",
+            "RoPE encodes absolute position by concatenating a one-hot vector to the input tokens.",
+            "RoPE injects positional information at every layer by applying a rotation matrix to the queries and keys, ensuring the inner product depends only on their relative distance.",
+            "RoPE eliminates the need for any positional encoding by relying solely on causal masking."
+        ],
+        "correct": 2,
+        "explanation": "RoPE works by multiplying the query and key vectors by a rotation matrix that depends on their absolute position. A key mathematical property of this rotation is that the inner product of a rotated query and a rotated key depends only on their relative position distance, effectively incorporating relative positional information at every layer."
+    },
+    {
+        "type": "mcq",
+        "category": "Transformer & Self-attention",
+        "question": "In a standard Transformer decoder, causal masking is applied to the self-attention mechanism. How is this mask mathematically applied before the softmax function?",
+        "options": [
+            "By multiplying the upper triangular elements of the attention matrix $QK^T$ by 0.",
+            "By subtracting 1 from the upper triangular elements of the attention matrix $QK^T$.",
+            "By setting the upper triangular elements (where $j > i$) of the attention matrix $QK^T$ to $-\\infty$.",
+            "By setting the lower triangular elements (where $j < i$) of the attention matrix $QK^T$ to $-\\infty$."
+        ],
+        "correct": 2,
+        "explanation": "To prevent future tokens from influencing the current token prediction (causality), the upper triangular elements of the unnormalized attention scores $QK^T$ (where key position $j$ is strictly greater than query position $i$) are set to $-\\infty$. When softmax is applied, $e^{-\\infty}$ becomes exactly 0."
+    },
+    {
+        "type": "mcq",
+        "category": "Transformer & Self-attention",
+        "question": "For a very long sequence length $N$ in a standard Transformer, which operation dominates the computational complexity of a single layer?",
+        "options": [
+            "The Multi-Layer Perceptron (FFN) computation, which is $\\mathcal{O}(N \\cdot d_{model}^2)$.",
+            "The self-attention matrix multiplication $QK^T$ and softmax, which are $\\mathcal{O}(N^2 \\cdot d_{model})$.",
+            "The layer normalization, which is $\\mathcal{O}(N \\cdot d_{model})$.",
+            "The linear projections for Q, K, and V, which are $\\mathcal{O}(N \\cdot d_{model}^2)$."
+        ],
+        "correct": 1,
+        "explanation": "While FFN complexity $\\mathcal{O}(N \\cdot d_{model}^2)$ scales linearly with $N$, the attention mechanism computes pairwise dot products for all $N$ tokens, scaling quadratically $\\mathcal{O}(N^2 \\cdot d_{model})$. For very large $N$, the $N^2$ term dominates the overall compute and memory requirements."
+    },
+    {
+        "type": "mcq",
+        "category": "Transformer & Self-attention",
+        "question": "Many modern LLMs replace the standard ReLU activation in the Feed-Forward Network with SwiGLU. What is the mathematical definition of the SwiGLU activation for an input $x$ and weight matrices $W_1, W_2$?",
+        "options": [
+            "$\\text{SwiGLU}(x) = \\max(0, x W_1) \\cdot (x W_2)$",
+            "$\\text{SwiGLU}(x) = (x W_1) \\odot \\sigma(x W_2)$",
+            "$\\text{SwiGLU}(x) = \\text{Swish}(x W_1) \\odot (x W_2)$",
+            "$\\text{SwiGLU}(x) = \\tanh(x W_1) \\odot (x W_2)$"
+        ],
+        "correct": 2,
+        "explanation": "SwiGLU (Swish Gated Linear Unit) is defined as $\\text{Swish}(x W_1) \\odot (x W_2)$, where $\\text{Swish}(z) = z \\cdot \\sigma(z)$. It introduces a multiplicative gating mechanism that has been empirically shown to yield better performance and training stability in large language models."
+    },
+    {
+        "type": "mcq",
+        "category": "Transformer & Self-attention",
+        "question": "Which of the following mechanisms describes ALiBi (Attention with Linear Biases) for positional encoding?",
+        "options": [
+            "It adds a learned sinusoidal vector to the input embeddings.",
+            "It subtracts a constant bias proportional to the distance between the query and key directly from the attention scores before softmax.",
+            "It uses a convolutional layer to extract local positional features before self-attention.",
+            "It rotates the keys and queries in the complex plane proportional to their positions."
+        ],
+        "correct": 1,
+        "explanation": "ALiBi completely removes positional embeddings from the input. Instead, it biases the attention scores $q_i \\cdot k_j$ by subtracting a penalty $m \\cdot |i - j|$, where $m$ is a head-specific scalar. This linear penalty smoothly decays attention for distant tokens and enables excellent zero-shot length extrapolation."
+    },
+    {
+        "type": "mcq",
+        "category": "Transformer & Self-attention",
+        "question": "In a Sparse Mixture of Experts (MoE) Transformer layer, how does the routing mechanism affect the computational complexity during inference for a single token?",
+        "options": [
+            "It increases the compute per token because the token must be processed by all experts.",
+            "It decreases the overall parameter count of the model while maintaining compute.",
+            "It keeps the active parameters and compute per token roughly constant while drastically increasing the total parameter capacity of the model.",
+            "It forces the model to use dynamic sequence lengths, reducing $N$ for the attention computation."
+        ],
+        "correct": 2,
+        "explanation": "In an MoE model, a routing network selects only a small subset of experts (e.g., top-2 out of 8) to process each token. This decouples the model's total parameter count (which becomes very large) from the active parameters used per token (which remains comparable to a dense model), allowing massive capacity scaling without a proportional compute penalty."
+    },
+    {
+        "type": "mcq",
+        "category": "RNN & LSTM cell",
+        "question": "In a standard LSTM cell, the cell state $C_t$ is updated using the forget gate $f_t$, the input gate $i_t$, the previous cell state $C_{t-1}$, and the candidate cell state $\\tilde{C}_t$. Which of the following is the correct mathematical formula for this update?",
+        "options": [
+            "$C_t = f_t \\odot \\tilde{C}_t + i_t \\odot C_{t-1}$",
+            "$C_t = f_t \\odot C_{t-1} + i_t \\odot \\tilde{C}_t$",
+            "$C_t = \\tanh(f_t \\odot C_{t-1} + i_t \\odot \\tilde{C}_t)$",
+            "$C_t = \\sigma(f_t \\odot C_{t-1} + i_t \\odot \\tilde{C}_t)$"
+        ],
+        "correct": 1,
+        "explanation": "The correct update equation for the LSTM cell state is $C_t = f_t \\odot C_{t-1} + i_t \\odot \\tilde{C}_t$. The forget gate $f_t$ dictates what to discard from the previous state, while the input gate $i_t$ scales the new candidate information $\\tilde{C}_t$ to be added."
+    },
+    {
+        "type": "mcq",
+        "category": "RNN & LSTM cell",
+        "question": "Standard Recurrent Neural Networks (RNNs) suffer from the vanishing gradient problem primarily because:",
+        "options": [
+            "The loss function is strictly convex, causing gradients to plateau early.",
+            "Backpropagation Through Time (BPTT) involves repeated multiplication of the same recurrent weight matrix, leading to exponentially decaying gradients if the matrix's eigenvalues are less than 1.",
+            "The input sequences contain too much zero-padding, which zeros out the gradients.",
+            "The softmax activation at the output layer heavily penalizes long sequences."
+        ],
+        "correct": 1,
+        "explanation": "In standard RNNs, computing gradients with respect to early time steps involves multiplying the recurrent weight matrix $W_h$ repeatedly. If the dominant eigenvalue of $W_h$ is $< 1$, these repeated multiplications cause the gradients to vanish exponentially."
+    },
+    {
+        "type": "mcq",
+        "category": "RNN & LSTM cell",
+        "question": "A well-known best practice when initializing an LSTM network is to set the bias of the forget gate $f_t = \\sigma(W_f x_t + U_f h_{t-1} + b_f)$ to a positive value (e.g., $1.0$). What is the primary reason for this?",
+        "options": [
+            "To encourage the LSTM to forget most of the past information early in training, focusing only on the current input.",
+            "To shift the sigmoid activation function to a linear regime, avoiding saturation.",
+            "To initialize the forget gate outputs close to 1, ensuring that the cell state gradient flows smoothly backward in time at the beginning of training.",
+            "To strictly prevent the cell state $C_t$ from exceeding 1.0."
+        ],
+        "correct": 2,
+        "explanation": "Initializing the forget gate bias to a positive value (like 1.0) makes the sigmoid output close to 1. This means the cell state $C_t$ largely copies $C_{t-1}$ at initialization, creating a near-identity mapping that allows gradients to flow effectively across many time steps during early training."
+    },
+    {
+        "type": "mcq",
+        "category": "RNN & LSTM cell",
+        "question": "In the context of Truncated Backpropagation Through Time (BPTT) for training RNNs on very long sequences, what is the main trade-off of using a small truncation length $k_{trunc}$?",
+        "options": [
+            "It decreases memory usage but prevents the network from learning dependencies that span longer than $k_{trunc}$ steps.",
+            "It increases memory usage but allows the network to learn infinite-range dependencies.",
+            "It strictly increases training time due to frequent weight updates.",
+            "It causes the forward pass to be truncated, resulting in loss of sequence output."
+        ],
+        "correct": 0,
+        "explanation": "Truncated BPTT splits a long sequence into chunks of length $k_{trunc}$ and only backpropagates errors for $k_{trunc}$ steps. While this bounds memory and compute, it inherently prevents the gradient from flowing back beyond $k_{trunc}$ steps, making it impossible to learn dependencies longer than that."
+    },
+    {
+        "type": "mcq",
+        "category": "RNN & LSTM cell",
+        "question": "How does a Gated Recurrent Unit (GRU) fundamentally differ from an LSTM in terms of its gating mechanism?",
+        "options": [
+            "A GRU has a separate memory cell state $C_t$ and hidden state $h_t$, while an LSTM merges them.",
+            "A GRU couples the forget and input gates into a single update gate $z_t$, such that the previous state is scaled by $(1 - z_t)$ and the new candidate state by $z_t$.",
+            "A GRU uses ReLU activations for its gates instead of Sigmoid.",
+            "A GRU adds an explicit output gate to control the visibility of the cell state."
+        ],
+        "correct": 1,
+        "explanation": "Unlike the LSTM which has independent input and forget gates, the GRU uses a single update gate $z_t$. The hidden state update is $h_t = (1 - z_t) \\odot h_{t-1} + z_t \\odot \\tilde{h}_t$. This reduces the number of parameters and simplifies the architecture while retaining similar performance."
+    },
+    {
+        "type": "mcq",
+        "category": "RNN & LSTM cell",
+        "question": "What is the specific architectural modification introduced in 'Peephole' LSTMs compared to standard LSTMs?",
+        "options": [
+            "The gates ($i_t, f_t, o_t$) receive the previous cell state $C_{t-1}$ as an additional input, allowing them to inspect the internal memory before gating.",
+            "The cell state $C_t$ is bypassed entirely during the forward pass.",
+            "The input $x_t$ is fed directly to the output gate without passing through the hidden state.",
+            "The hidden state $h_{t-1}$ is removed from the gate computations."
+        ],
+        "correct": 0,
+        "explanation": "In standard LSTMs, gates are controlled only by $x_t$ and $h_{t-1}$. Peephole connections allow the gates to also 'look' at the cell state $C_{t-1}$ (and $C_t$ for the output gate), incorporating $W_c \\odot C_{t-1}$ into the gate activations. This allows precise timing and counting behaviors."
+    },
+    {
+        "type": "mcq",
+        "category": "RNN & LSTM cell",
+        "question": "Which specific property of the LSTM's cell state $C_t$ update mechanism is primarily responsible for mitigating the vanishing gradient problem?",
+        "options": [
+            "The use of the $\\tanh$ activation function on the cell state.",
+            "The additive nature of the update $C_t = f_t \\odot C_{t-1} + \\dots$, which allows gradients to flow linearly without matrix multiplication when $f_t \\approx 1$.",
+            "The strict orthogonal initialization of the recurrent weight matrices.",
+            "The division of the cell state by the sequence length $T$ at each step."
+        ],
+        "correct": 1,
+        "explanation": "The core innovation of the LSTM is the additive linear path for $C_t$. The derivative of $C_t$ with respect to $C_{t-1}$ includes the term $f_t$. If the network learns to set the forget gate $f_t \\approx 1$, the gradient passes back perfectly without decaying, completely bypassing the multiplicative decay of standard RNNs."
+    },
+    {
+        "type": "mcq",
+        "category": "RNN & LSTM cell",
+        "question": "In a Bidirectional RNN, if the forward RNN has hidden state dimension $D_h$ and the backward RNN has hidden state dimension $D_h$, what is the typical dimensionality of the combined hidden state representation for a single time step $t$?",
+        "options": [
+            "$D_h$, because the forward and backward states are averaged.",
+            "$2 \\times D_h$, because the forward state $\\overrightarrow{h}_t$ and backward state $\\overleftarrow{h}_t$ are concatenated.",
+            "$D_h^2$, because they are combined via an outer product.",
+            "$\\sqrt{D_h}$, to maintain normalized variance."
+        ],
+        "correct": 1,
+        "explanation": "In Bidirectional RNNs, the standard approach is to concatenate the forward hidden state and the backward hidden state at each time step. This yields a combined representation of size $2 \\times D_h$ that encapsulates both past and future context."
+    },
+    {
+        "type": "mcq",
+        "category": "RNN & LSTM cell",
+        "question": "When training an RNN for sequence generation using 'Teacher Forcing', the network is fed the ground-truth previous token instead of its own prediction. What well-known issue arises from this during inference?",
+        "options": [
+            "Catastrophic forgetting.",
+            "Exposure Bias, where the model struggles at inference time because it has never been exposed to its own accumulated prediction errors.",
+            "Gradient Explosion, caused by the sudden shift in input distribution.",
+            "Mode Collapse, where the RNN outputs the exact same sequence regardless of input."
+        ],
+        "correct": 1,
+        "explanation": "Teacher forcing trains the model using perfect past tokens. During inference, the model must feed its own (potentially flawed) predictions back as input. Because it was never trained to recover from its own mistakes, errors compound rapidly. This discrepancy between training and inference is called Exposure Bias."
+    },
+    {
+        "type": "mcq",
+        "category": "RNN & LSTM cell",
+        "question": "In a GRU, what is the role of the reset gate $r_t$?",
+        "options": [
+            "It determines how much of the new input $x_t$ should be ignored.",
+            "It determines how much of the previous hidden state $h_{t-1}$ should be incorporated into the calculation of the new candidate hidden state $\\tilde{h}_t$.",
+            "It forces the hidden state to zero if the sequence reaches an EOS (End of Sequence) token.",
+            "It scales the output logits before the softmax layer."
+        ],
+        "correct": 1,
+        "explanation": "The reset gate $r_t$ in a GRU is used to compute the candidate hidden state: $\\tilde{h}_t = \\tanh(W x_t + U (r_t \\odot h_{t-1}))$. It effectively allows the model to drop previous state information when computing the new candidate state, acting as a short-term memory reset mechanism."
+    },
+    {
+        "type": "mcq",
+        "category": "CNN & General Deep Learning",
+        "question": "Given a 1D convolution with kernel size $K$ and dilation rate $D$, what is the effective kernel size $K_{eff}$, which represents the receptive field of a single convolutional filter?",
+        "options": [
+            "$K_{eff} = K \\times D$",
+            "$K_{eff} = K + D - 1$",
+            "$K_{eff} = K + (K - 1)(D - 1)$",
+            "$K_{eff} = K^D$"
+        ],
+        "correct": 2,
+        "explanation": "Dilation inserts $D-1$ spaces between kernel elements. For a kernel of size $K$, there are $K-1$ gaps. The total size spans the $K$ elements plus the $(K-1)(D-1)$ spaces, yielding $K_{eff} = K + (K - 1)(D - 1)$."
+    },
+    {
+        "type": "mcq",
+        "category": "CNN & General Deep Learning",
+        "question": "A standard 2D convolution layer has input channels $C_{in}$, output channels $C_{out}$, and a kernel size of $K \\times K$. If this is replaced by a Depthwise Separable Convolution, what is the formula for the number of parameters (ignoring bias)?",
+        "options": [
+            "$K^2 \\cdot C_{in} \\cdot C_{out}$",
+            "$K^2 \\cdot C_{in} + C_{in} \\cdot C_{out}$",
+            "$K^2 \\cdot C_{out} + C_{in} \\cdot C_{out}$",
+            "$(K^2 + C_{in}) \\cdot C_{out}$"
+        ],
+        "correct": 1,
+        "explanation": "Depthwise Separable Convolution splits the operation into two steps: a depthwise spatial convolution ($K \\times K \\times C_{in}$ parameters, applying one filter per input channel) and a pointwise $1 \\times 1$ convolution ($1 \\times 1 \\times C_{in} \\times C_{out}$ parameters) to combine channels. Total parameters: $K^2 \\cdot C_{in} + C_{in} \\cdot C_{out}$."
+    },
+    {
+        "type": "mcq",
+        "category": "CNN & General Deep Learning",
+        "question": "What is the primary architectural purpose of a $1 \\times 1$ convolution layer in networks like Inception or ResNet?",
+        "options": [
+            "To increase the spatial receptive field of the network without adding large kernels.",
+            "To perform spatial pooling and reduce the spatial dimensions (width and height) of the feature map.",
+            "To perform channel-wise pooling or dimensionality reduction/expansion across the depth of the feature map while leaving spatial dimensions unchanged.",
+            "To introduce non-linearities strictly in the spatial domain."
+        ],
+        "correct": 2,
+        "explanation": "A $1 \\times 1$ convolution acts as a pixel-wise fully connected layer across channels. It computes linear combinations of the input channels, allowing the network to reduce (or increase) the number of channels ($C_{out}$ < $C_{in}$) without altering the spatial dimensions ($H \\times W$)."
+    },
+    {
+        "type": "mcq",
+        "category": "CNN & General Deep Learning",
+        "question": "How does Batch Normalization behave differently during model inference (evaluation) compared to training?",
+        "options": [
+            "During inference, it computes the mean and variance of the current test batch to normalize the data.",
+            "During inference, it uses exponential moving averages of the mean and variance computed during training, rather than the statistics of the test batch.",
+            "During inference, the scale ($\\gamma$) and shift ($\\beta$) parameters are ignored to speed up computation.",
+            "Batch Normalization is entirely bypassed during inference."
+        ],
+        "correct": 1,
+        "explanation": "During training, BN normalizes using the mean and variance of the current mini-batch. To ensure deterministic predictions for single samples during inference, BN uses the fixed, pre-computed running mean and running variance tracked during the training phase."
+    },
+    {
+        "type": "mcq",
+        "category": "CNN & General Deep Learning",
+        "question": "A standard Convolutional Neural Network (without fully connected layers) is mathematically said to be:",
+        "options": [
+            "Equivariant to translation, meaning a shift in the input image results in an equivalent shift in the output feature map.",
+            "Invariant to translation, meaning a shift in the input image results in exactly the same output feature map without any shift.",
+            "Equivariant to rotation, meaning rotating the input perfectly rotates the output features.",
+            "Invariant to scale, meaning scaling the input image does not change the feature map values."
+        ],
+        "correct": 0,
+        "explanation": "Convolution operations are translationally equivariant. If you shift the input image by 1 pixel, the resulting feature map is also shifted by 1 pixel (accounting for stride). Global pooling at the end of the network is what ultimately creates translation invariance for classification."
+    },
+    {
+        "type": "mcq",
+        "category": "CNN & General Deep Learning",
+        "question": "When using Transposed Convolutions (often called Deconvolutions) for upsampling in generative models, 'checkerboard artifacts' frequently appear in the output. What is the primary cause of these artifacts?",
+        "options": [
+            "The use of ReLU activation which zeros out negative pixels in a checkerboard pattern.",
+            "Uneven overlap of the convolutional kernel when the kernel size is not divisible by the stride.",
+            "Gradient explosion during backpropagation in the transposed layer.",
+            "The spectral norm of the weight matrix exceeding 1."
+        ],
+        "correct": 1,
+        "explanation": "Transposed convolutions paint the kernel onto the output. If the kernel size is not a multiple of the stride, the overlap of the kernels on the output pixels is uneven. Some pixels receive contributions from more kernel applications than others, creating a regular checkerboard pattern of varying magnitudes."
+    },
+    {
+        "type": "mcq",
+        "category": "CNN & General Deep Learning",
+        "question": "In a Grouped Convolution (as used in ResNeXt), the input channels $C_{in}$ and output channels $C_{out}$ are divided into $G$ independent groups. By what factor are the parameters of the convolutional layer reduced compared to a standard convolution?",
+        "options": [
+            "Reduced by a factor of $G$.",
+            "Reduced by a factor of $G^2$.",
+            "Reduced by a factor of $\\sqrt{G}$.",
+            "The parameters remain exactly the same, only computation is reduced."
+        ],
+        "correct": 0,
+        "explanation": "In a standard conv, parameters are $K^2 \\cdot C_{in} \\cdot C_{out}$. In grouped conv, each group takes $C_{in}/G$ channels and outputs $C_{out}/G$ channels. Parameters per group: $K^2 (C_{in}/G) (C_{out}/G)$. Total for $G$ groups: $G \\cdot K^2 (C_{in}/G) (C_{out}/G) = \frac{K^2 C_{in} C_{out}}{G}$. The parameters are reduced by a factor of $G$."
+    },
+    {
+        "type": "mcq",
+        "category": "CNN & General Deep Learning",
+        "question": "Modern CNN architectures (like ResNet) replace the traditional dense layers at the end of the network with Global Average Pooling (GAP). What is the primary advantage of GAP over flattening and using a dense layer?",
+        "options": [
+            "GAP significantly increases model capacity to learn complex decision boundaries.",
+            "GAP allows the network to process inputs of any arbitrary spatial dimension without changing the parameter count.",
+            "GAP acts as a spatial attention mechanism.",
+            "GAP converts the feature map to a completely sparse representation."
+        ],
+        "correct": 1,
+        "explanation": "Flattening a spatial feature map of size $H \\times W \\times C$ into a dense layer requires weights dependent on $H$ and $W$. GAP averages each $H \\times W$ feature map into a single scalar, yielding a vector of length $C$ regardless of the input image size. This removes the dependency on input resolution and drastically reduces parameters, preventing overfitting."
+    },
+    {
+        "type": "mcq",
+        "category": "CNN & General Deep Learning",
+        "question": "Consider a CNN with two sequential convolutional layers. Layer 1 has kernel size $K_1$ and stride $S_1=1$. Layer 2 has kernel size $K_2$ and stride $S_2=1$. What is the total receptive field of a single neuron in the output of Layer 2 with respect to the original input?",
+        "options": [
+            "$K_1 \\times K_2$",
+            "$K_1 + K_2 - 1$",
+            "$K_1 + K_2 + 1$",
+            "$\\max(K_1, K_2)$"
+        ],
+        "correct": 1,
+        "explanation": "A neuron in Layer 2 sees a $K_2 \times K_2$ region of Layer 1. Each neuron in Layer 1 sees a $K_1 \times K_1$ region of the input. Because the stride is 1, the span on the original input is $K_2$ pixels, plus the $(K_1 - 1)$ extra pixels seen by the edges of the $K_2$ region. Total receptive field is $K_1 + K_2 - 1$."
+    },
+    {
+        "type": "mcq",
+        "category": "CNN & General Deep Learning",
+        "question": "In the training of Generative Adversarial Networks (GANs), Spectral Normalization is often applied to the discriminator's layers. What mathematical property does Spectral Normalization strictly enforce?",
+        "options": [
+            "It enforces the weight matrices to be perfectly orthogonal, meaning $W^T W = I$.",
+            "It restricts the Lipschitz constant of the layer to be $\\le 1$ by dividing the weight matrix by its largest singular value.",
+            "It normalizes the variance of the gradients during backpropagation to exactly 1.",
+            "It ensures that the output feature maps have zero mean and unit variance."
+        ],
+        "correct": 1,
+        "explanation": "Spectral Normalization computes the spectral norm (the largest singular value, often approximated using power iteration) of the weight matrix and divides the matrix by this value. This ensures the weight matrix has a spectral norm of 1, bounding the Lipschitz constant of the network, which is crucial for the stability of Wasserstein GANs."
+    },
+    {
+        "type": "mcq",
+        "category": "MLOps & Data Drift",
+        "question": "In the context of machine learning monitoring, which of the following scenarios strictly defines 'Concept Drift' as opposed to 'Data Drift' (Covariate Shift)?",
+        "options": [
+            "The distribution of the input features $P(X)$ changes significantly over time, but the mapping $P(Y|X)$ remains constant.",
+            "The conditional probability of the target given the features $P(Y|X)$ changes over time, meaning the fundamental relationship between input and output has shifted.",
+            "The proportion of missing values in a critical feature suddenly spikes due to a broken sensor.",
+            "The model's inference latency increases due to an underlying infrastructure degradation."
+        ],
+        "correct": 1,
+        "explanation": "Data drift (or covariate shift) occurs when the input distribution $P(X)$ changes. Concept drift occurs when the ground-truth relationship between features and the target variable $P(Y|X)$ changes (e.g., what was considered a 'fraudulent' pattern last year is now considered 'normal' behavior)."
+    },
+    {
+        "type": "mcq",
+        "category": "MLOps & Data Drift",
+        "question": "When monitoring for data drift, the Population Stability Index (PSI) is a widely used metric. How is PSI computationally related to Kullback-Leibler (KL) Divergence for two distributions, Reference (R) and Current (C)?",
+        "options": [
+            "PSI is exactly the KL divergence $D_{KL}(C || R)$.",
+            "PSI is the symmetric sum of KL divergences: $D_{KL}(C || R) + D_{KL}(R || C)$.",
+            "PSI is the square root of the KL divergence.",
+            "PSI is unrelated to KL divergence; it is purely based on the Kolmogorov-Smirnov test."
+        ],
+        "correct": 1,
+        "explanation": "PSI is calculated as $\\sum (C_i - R_i) \\ln(C_i / R_i)$. This can be rewritten as $\\sum C_i \\ln(C_i / R_i) + \\sum R_i \\ln(R_i / C_i)$, which is exactly $D_{KL}(C || R) + D_{KL}(R || C)$. It provides a symmetric measure of difference between the reference and current distributions."
+    },
+    {
+        "type": "mcq",
+        "category": "MLOps & Data Drift",
+        "question": "Adversarial Validation is a technique used to detect if a test dataset is drawn from the same distribution as the training dataset. How is this technique implemented?",
+        "options": [
+            "By adding Gaussian noise to the test set and measuring the drop in model accuracy.",
+            "By training a binary classifier to predict whether a given sample belongs to the training set or the test set.",
+            "By using a Generative Adversarial Network (GAN) to generate synthetic test data and comparing it.",
+            "By measuring the adversarial robustness of the model using Fast Gradient Sign Method (FGSM)."
+        ],
+        "correct": 1,
+        "explanation": "Adversarial Validation involves concatenating the train and test features, assigning a label of 0 to train and 1 to test, and training a classifier (e.g., Random Forest/XGBoost). If the classifier achieves a high ROC-AUC (e.g., > 0.7), the distributions are easily distinguishable, indicating significant covariate shift/data drift."
+    },
+    {
+        "type": "mcq",
+        "category": "MLOps & Data Drift",
+        "question": "Which type of drift describes a scenario where the distribution of the target variable $P(Y)$ changes, but the relationship $P(X|Y)$ remains exactly the same?",
+        "options": [
+            "Covariate Shift",
+            "Concept Drift",
+            "Prior Probability Shift",
+            "Domain Shift"
+        ],
+        "correct": 2,
+        "explanation": "Prior Probability Shift (also known as Label Shift) occurs when the base rate of the target labels $P(Y)$ changes (e.g., a disease becomes much more common), but the distribution of features for a given class $P(X|Y)$ remains unchanged."
+    },
+    {
+        "type": "mcq",
+        "category": "MLOps & Data Drift",
+        "question": "A sudden, structural change in the data generating process (e.g., a new government regulation instantly changing consumer behavior) is classified as which type of concept drift?",
+        "options": [
+            "Gradual Drift",
+            "Incremental Drift",
+            "Sudden Drift",
+            "Recurring Drift"
+        ],
+        "correct": 2,
+        "explanation": "Sudden drift (or Abrupt drift) happens when the underlying concept changes completely and instantaneously, unlike gradual drift where the old and new concepts overlap for a period, or incremental drift where the concept slowly morphs over time."
+    },
+    {
+        "type": "mcq",
+        "category": "MLOps & Data Drift",
+        "question": "When adapting to continuous Concept Drift, what is a primary limitation of using a simple Sliding Window technique to retrain the model?",
+        "options": [
+            "It requires storing the entire historical dataset in memory.",
+            "It struggles to remember seasonal or recurring patterns because older data is strictly discarded.",
+            "It causes the model to converge to a trivial solution (predicting the majority class).",
+            "It mathematically guarantees catastrophic forgetting of the latest batch."
+        ],
+        "correct": 1,
+        "explanation": "A sliding window strictly trains on the most recent $N$ samples and discards everything older. If the data has recurring drift (e.g., seasonal changes where summer patterns repeat every year), the sliding window will completely forget the summer pattern by the time winter ends."
+    },
+    {
+        "type": "mcq",
+        "category": "Docker",
+        "question": "In a Dockerfile, both `ENTRYPOINT` and `CMD` can be used to specify the command to run when the container starts. If a Dockerfile specifies `ENTRYPOINT [\"python\", \"app.py\"]` and the user runs `docker run my-image --port 8080`, what is the exact command executed inside the container?",
+        "options": [
+            "`python app.py` (the `--port 8080` is ignored)",
+            "`--port 8080` (overriding the ENTRYPOINT entirely)",
+            "`python app.py --port 8080`",
+            "The container crashes with a syntax error."
+        ],
+        "correct": 2,
+        "explanation": "When `ENTRYPOINT` is defined using the exec form (JSON array), any arguments passed to `docker run` on the command line are appended as arguments to the `ENTRYPOINT` executable. Thus, it runs `python app.py --port 8080`."
+    },
+    {
+        "type": "mcq",
+        "category": "Docker",
+        "question": "To optimize Docker build times using layer caching for a Python application, what is the best practice for ordering the `COPY` and `RUN` commands in the Dockerfile?",
+        "options": [
+            "Copy all files (`COPY . .`), then run `pip install -r requirements.txt`.",
+            "Copy `requirements.txt`, run `pip install -r requirements.txt`, then copy the rest of the application code (`COPY . .`).",
+            "Run `pip install -r requirements.txt` before copying any files.",
+            "Combine copying and installing into a single layer: `RUN copy . . && pip install -r requirements.txt`"
+        ],
+        "correct": 1,
+        "explanation": "Docker caches layers sequentially. If `COPY . .` is executed first, any change to any file in the repo invalidates the cache for all subsequent layers, forcing `pip install` to rerun. By copying only `requirements.txt` and installing dependencies first, the heavy `pip install` layer remains cached unless the requirements file itself changes."
+    },
+    {
+        "type": "mcq",
+        "category": "Docker",
+        "question": "What is the primary benefit of using a Multi-Stage Build in Docker when containerizing a compiled application (e.g., Go, C++, or a heavy ML pipeline)?",
+        "options": [
+            "It allows a single container to run multiple independent operating systems simultaneously.",
+            "It separates the build environment (containing compilers/toolchains) from the final runtime image, resulting in a drastically smaller and more secure final image.",
+            "It enables Docker to utilize multiple CPU cores during the image build process.",
+            "It automatically load-balances traffic across multiple running instances of the image."
+        ],
+        "correct": 1,
+        "explanation": "Multi-stage builds allow you to use a heavy base image with compilers and headers to build the binary, and then copy ONLY the compiled artifact into a fresh, minimal runtime image (like Alpine or distroless). This keeps the final image size very small and reduces the attack surface."
+    },
+    {
+        "type": "mcq",
+        "category": "Docker",
+        "question": "When attaching storage to a Docker container, what is the core architectural difference between a 'Bind Mount' and a 'Docker Volume'?",
+        "options": [
+            "A Bind Mount maps a specific file or directory from the host OS directly into the container, whereas a Docker Volume is fully managed by Docker and abstracted away from the host's standard filesystem.",
+            "A Docker Volume is strictly read-only, whereas a Bind Mount allows read/write access.",
+            "A Bind Mount stores data in RAM, whereas a Docker Volume stores data on the physical disk.",
+            "There is no difference; they are synonymous terms in the Docker ecosystem."
+        ],
+        "correct": 0,
+        "explanation": "Bind mounts depend on the directory structure of the host machine (e.g., `/home/user/data:/app/data`), which can cause portability issues across different OSs. Docker Volumes are managed entirely by Docker (`/var/lib/docker/volumes/`), are easier to back up, and are completely decoupled from the host's specific directory layout."
+    },
+    {
+        "type": "mcq",
+        "category": "Docker",
+        "question": "What critical security vulnerability is mitigated by running the Docker daemon in 'Rootless mode'?",
+        "options": [
+            "It prevents containers from communicating over the public internet.",
+            "It ensures that if an attacker breaks out of the container, they only gain privileges of an unprivileged user on the host, rather than full root access.",
+            "It encrypts the Docker images at rest on the disk.",
+            "It blocks the container from consuming more than 1GB of RAM."
+        ],
+        "correct": 1,
+        "explanation": "By default, the Docker daemon runs as the host's root user. If an attacker exploits a container breakout vulnerability, they gain root access to the entire host machine. Rootless mode executes the Docker daemon and containers within a user namespace, mapping the container's root user to an unprivileged user on the host."
+    },
+    {
+        "type": "mcq",
+        "category": "Model Deployment",
+        "question": "In Triton Inference Server, the 'Dynamic Batching' feature is configured with a parameter `max_queue_delay_microseconds`. What is the fundamental trade-off governed by increasing this parameter?",
+        "options": [
+            "It increases model accuracy at the cost of higher CPU memory consumption.",
+            "It increases the likelihood of forming larger batches (improving overall throughput) at the cost of higher latency for individual requests.",
+            "It prioritizes real-time latency for individual requests by immediately executing them, completely disabling batching.",
+            "It shifts computation from the GPU to the CPU to save power."
+        ],
+        "correct": 1,
+        "explanation": "Dynamic batching waits up to `max_queue_delay` to combine multiple independent incoming requests into a single larger batch for GPU execution. A larger delay allows bigger batches to form, maximizing GPU utilization (throughput), but means the first request in the queue waits longer before execution begins (higher latency)."
+    },
+    {
+        "type": "mcq",
+        "category": "Model Deployment",
+        "question": "When performing Post-Training Quantization (PTQ) to convert an FP32 model to INT8, a 'Calibration Dataset' is often required. What is the specific mathematical purpose of this calibration step?",
+        "options": [
+            "To fine-tune the model's weights using backpropagation to recover accuracy lost during quantization.",
+            "To determine the dynamic ranges (min and max values) of the activations at each layer, allowing the calculation of optimal scale and zero-point factors for the INT8 mapping.",
+            "To convert the model architecture to support sparse matrix multiplication.",
+            "To automatically prune the network of weights that are exactly zero."
+        ],
+        "correct": 1,
+        "explanation": "In PTQ, the network's weights are static, but the activations vary based on the input. To properly map the continuous FP32 activations to discrete INT8 values without massive overflow/underflow, the calibration dataset is passed through the model to observe the distribution of activations and calculate optimal quantization scales."
+    },
+    {
+        "type": "mcq",
+        "category": "Model Deployment",
+        "question": "In a robust MLOps deployment pipeline, what is the defining characteristic of a 'Shadow Deployment' (Dark Launching) strategy?",
+        "options": [
+            "The new model gradually receives 5%, then 10%, then 100% of live traffic, while the old model scales down.",
+            "The new model receives a copy of the live production traffic, makes predictions, and logs them, but its predictions are NOT returned to the end user.",
+            "The new model replaces the old model instantly across all servers to test for catastrophic failure.",
+            "The new model is deployed in a purely offline environment without access to real-time data streams."
+        ],
+        "correct": 1,
+        "explanation": "In a Shadow deployment, the new model processes real production traffic in parallel with the current primary model. The primary model serves the user response, while the shadow model's outputs are only logged for analysis. This allows safe evaluation of the new model's performance and latency on real data with zero risk to the user experience."
+    },
+    {
+        "type": "mcq",
+        "category": "Model Deployment",
+        "question": "When converting a PyTorch model to ONNX, tools like ONNX Runtime often apply 'Operator Fusion'. Which of the following is a classic example of Operator Fusion used to accelerate inference?",
+        "options": [
+            "Replacing a 64-bit float tensor with a 16-bit float tensor.",
+            "Splitting a large matrix multiplication across multiple GPUs.",
+            "Combining a Convolution layer, followed by Batch Normalization, followed by a ReLU activation into a single optimized mathematical kernel.",
+            "Removing all dropout layers from the computational graph."
+        ],
+        "correct": 2,
+        "explanation": "Operator fusion combines multiple sequential operations in the computational graph into a single executable kernel. For example, Conv + BatchNorm + ReLU can be fused. This drastically reduces the overhead of launching multiple kernels on the GPU and prevents unnecessary read/write operations to the global memory."
+    },
+    {
+        "type": "mcq",
+        "category": "Data Leakage",
+        "question": "A data scientist applies Target Encoding to a categorical feature using the mean of the target variable for each category. They perform this encoding on the entire dataset BEFORE splitting the data into training and cross-validation folds. Why is this a severe methodological error?",
+        "options": [
+            "It causes the model to underfit because the categories lose their variance.",
+            "It introduces Data Leakage, as the validation folds' target values are implicitly included in the encoded features used to train the model.",
+            "It converts a categorical feature into a continuous feature, which breaks tree-based algorithms.",
+            "It creates infinite values if a category only appears once in the dataset."
+        ],
+        "correct": 1,
+        "explanation": "If target encoding is applied to the full dataset before splitting, the calculated mean for a category includes the targets of the validation set. When the model trains on the training fold, it is indirectly 'seeing' the target values of the validation fold through the encoded feature, leading to artificially inflated validation performance (Data Leakage)."
+    },
+    {
+        "type": "mcq",
+        "category": "Data Leakage",
+        "question": "When training a model for time-series forecasting (e.g., predicting stock prices), which cross-validation strategy explicitly prevents the data leakage known as 'Look-Ahead Bias'?",
+        "options": [
+            "Standard K-Fold Cross Validation.",
+            "Leave-One-Out Cross Validation (LOOCV).",
+            "Time Series Split (Walk-Forward Validation), where the validation set always strictly follows the training set chronologically.",
+            "Stratified K-Fold Cross Validation."
+        ],
+        "correct": 2,
+        "explanation": "Standard random splitting (like K-Fold) mixes past and future data. If a model is trained on future data and validated on past data, it is a form of leakage (Look-Ahead Bias) because the future inherently contains information about the past. Walk-Forward Validation ensures the model only ever trains on data prior to the validation period."
+    },
+    {
+        "type": "mcq",
+        "category": "Data Leakage",
+        "question": "To handle a highly imbalanced dataset, a practitioner uses SMOTE (Synthetic Minority Over-sampling Technique). They apply SMOTE to the entire dataset to balance the classes, and then perform an 80/20 train/test split. What is the consequence of this workflow?",
+        "options": [
+            "The model will fail to compile due to duplicate rows.",
+            "Data Leakage occurs because synthetic samples generated by interpolating between data points may cross the train/test boundary, causing near-identical samples to appear in both sets.",
+            "The test set accuracy will be artificially low because the test set is no longer representative.",
+            "There is no consequence; this is the standard correct procedure for handling imbalance."
+        ],
+        "correct": 1,
+        "explanation": "Applying SMOTE before the split means synthetic data points are generated using the entire distribution. A synthetic point might be created based on neighbors where one neighbor ends up in the train set and one in the test set. The synthetic point (highly correlated with the test point) might end up in the train set, leading to data leakage and over-optimistic evaluation."
+    },
+    {
+        "type": "mcq",
+        "category": "AI Ethics",
+        "question": "In the context of machine learning privacy, what mathematical guarantee does $(\\epsilon, \\delta)$-Differential Privacy provide?",
+        "options": [
+            "It guarantees that an attacker cannot determine the exact value of any feature with probability greater than $\\delta$.",
+            "It ensures that the output distribution of the algorithm changes by at most a multiplicative factor of $e^{\\epsilon}$ plus an additive probability $\\delta$, whether a specific individual's record is included in the dataset or not.",
+            "It encrypts the dataset such that decrypting it requires $\\mathcal{O}(2^\\epsilon)$ operations.",
+            "It guarantees that the model's accuracy on minority groups will not deviate by more than $\\epsilon$ from the majority group."
+        ],
+        "correct": 1,
+        "explanation": "Differential privacy provides a formal guarantee that the presence or absence of any single individual's data in the training set does not significantly affect the algorithm's output. The parameter $\\epsilon$ bounds the multiplicative difference in probabilities, while $\\delta$ allows for a small probability of failure of the pure $\\epsilon$-DP bound."
+    },
+    {
+        "type": "mcq",
+        "category": "AI Ethics",
+        "question": "When auditing a binary classification model for fairness across a protected attribute (e.g., gender), what is the difference between 'Demographic Parity' and 'Equalized Odds'?",
+        "options": [
+            "Demographic Parity requires the true positive rates to be equal, while Equalized Odds requires the false positive rates to be equal.",
+            "Demographic Parity requires the model to predict the positive outcome at the exact same rate across all groups, regardless of the ground truth. Equalized Odds requires the model to have equal True Positive Rates AND False Positive Rates across groups.",
+            "Demographic Parity ensures the input features are scrubbed of sensitive data, while Equalized Odds modifies the loss function.",
+            "There is no difference; they are mathematical synonyms."
+        ],
+        "correct": 1,
+        "explanation": "Demographic parity simply demands that $P(\\hat{Y}=1 | A=0) = P(\\hat{Y}=1 | A=1)$, meaning the model approves loans (for example) at the same rate for both groups, ignoring actual creditworthiness. Equalized odds demands fairness conditional on the true label: $P(\\hat{Y}=1 | Y=y, A=0) = P(\\hat{Y}=1 | Y=y, A=1)$, meaning qualified individuals from both groups have the same chance of approval, and unqualified individuals have the same chance of rejection."
+    }
+]
 ];
