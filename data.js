@@ -1752,4 +1752,657 @@ const quizData = [
         "explanation": "Trong môi trường Production/Cross-validation, rất hay gặp class categoricals bị bỏ sót trong train set. `handle_unknown='ignore'` giúp Pipeline không bị crash."
     }
 ]
+,
+
+    {
+        "type": "mcq",
+        "category": "Support Vector Machine",
+        "question": "Trong bài toán tối ưu đối ngẫu (dual problem) của SVM lề mềm, hàm mục tiêu cần tối đa hóa phụ thuộc vào các nhân tử Lagrange $\\alpha_i$. Theo điều kiện KKT, một điểm dữ liệu $x_i$ có $0 < \\alpha_i < C$ sẽ có tính chất hình học nào sau đây?",
+        "options": [
+            "Nằm ngoài vùng lề (margin) và được phân loại đúng.",
+            "Nằm chính xác trên siêu mặt phẳng lề (margin hyperplane).",
+            "Nằm bên trong lề nhưng vẫn phân loại đúng.",
+            "Bị phân loại sai."
+        ],
+        "correct": 1,
+        "explanation": "Khi $0 < \\alpha_i < C$, biến slack $\\xi_i = 0$ và điểm dữ liệu thỏa mãn đẳng thức $y_i(w^T x_i + b) = 1$. Do đó, điểm này nằm chính xác trên lề (support vector)."
+    },
+    {
+        "type": "mcq",
+        "category": "Support Vector Machine",
+        "question": "Định lý Mercer (Mercer's Theorem) phát biểu rằng một hàm $K(x, x')$ có thể được sử dụng làm kernel trong SVM nếu và chỉ nếu nó tương đương với một tích vô hướng trong một không gian đặc trưng nào đó. Điều kiện cần và đủ cho ma trận Kernel (Gram matrix) $K$ trên tập dữ liệu hữu hạn là gì?",
+        "options": [
+            "Ma trận $K$ phải đối xứng và xác định dương (positive definite).",
+            "Ma trận $K$ phải đối xứng và nửa xác định dương (positive semi-definite).",
+            "Ma trận $K$ phải có các giá trị riêng phân biệt.",
+            "Ma trận $K$ phải có vết (trace) bằng 1."
+        ],
+        "correct": 1,
+        "explanation": "Định lý Mercer yêu cầu hàm kernel liên tục, đối xứng và tích phân của nó với bình phương hàm bất kỳ phải không âm. Trên thực tế (với tập dữ liệu hữu hạn), điều này tương đương với việc ma trận Gram $K$ (với $K_{ij} = K(x_i, x_j)$) là đối xứng và nửa xác định dương."
+    },
+    {
+        "type": "mcq",
+        "category": "Support Vector Machine",
+        "question": "Hàm mất mát (loss function) tự nhiên tương ứng với thuật toán Support Vector Machine là gì?",
+        "options": [
+            "Cross-Entropy Loss (Log Loss)",
+            "Mean Squared Error",
+            "Hinge Loss",
+            "Exponential Loss"
+        ],
+        "correct": 2,
+        "explanation": "SVM lề mềm tối thiểu hóa hàm mục tiêu tương đương với $\\min_w \\frac{1}{2}||w||^2 + C \\sum_{i=1}^n \\max(0, 1 - y_i(w^T x_i + b))$. Hàm $L(y, f(x)) = \\max(0, 1 - y f(x))$ chính là Hinge Loss."
+    },
+    {
+        "type": "mcq",
+        "category": "Support Vector Machine",
+        "question": "Khi sử dụng hàm nhân RBF (Radial Basis Function) $K(x, x') = \\exp(-\\gamma ||x - x'||^2)$ trong SVM, việc chọn giá trị $\\gamma$ (gamma) quá lớn sẽ dẫn đến hiện tượng gì?",
+        "options": [
+            "Mô hình sẽ bị underfitting do miền ảnh hưởng của mỗi support vector rất rộng.",
+            "Mô hình sẽ trở thành một bộ phân loại tuyến tính đơn giản.",
+            "Mô hình sẽ bị overfitting do miền ảnh hưởng của mỗi support vector bị thu hẹp lại rất nhỏ.",
+            "Biến slack $\\xi_i$ của tất cả các điểm đều bằng 0."
+        ],
+        "correct": 2,
+        "explanation": "Tham số $\\gamma$ kiểm soát độ rộng của hàm RBF. $\\gamma$ lớn làm cho hàm RBF phân rã rất nhanh, do đó miền ảnh hưởng của mỗi điểm rất hẹp. Khi đó, decision boundary sẽ bao quanh từng điểm dữ liệu riêng lẻ, dẫn đến overfitting nghiêm trọng."
+    },
+    {
+        "type": "mcq",
+        "category": "Support Vector Machine",
+        "question": "Trong không gian đặc trưng (feature space) tạo bởi RBF kernel, chiều (dimension) của không gian này là bao nhiêu?",
+        "options": [
+            "Phụ thuộc vào số lượng features ban đầu $d$.",
+            "Bằng với số lượng mẫu (samples) trong tập huấn luyện.",
+            "Vô hạn chiều.",
+            "$d^2$ chiều."
+        ],
+        "correct": 2,
+        "explanation": "Khai triển chuỗi Taylor của hàm lũy thừa trong RBF Kernel chứa vô số các số hạng đa thức. Do đó, RBF kernel ngầm ánh xạ dữ liệu ban đầu vào một không gian đặc trưng vô hạn chiều (infinite-dimensional feature space)."
+    },
+    {
+        "type": "mcq",
+        "category": "Support Vector Machine",
+        "question": "Giả sử bạn đang giải bài toán phân loại nhị phân bằng SVM tuyến tính trên tập dữ liệu có $n$ mẫu, trong không gian $d$ chiều ($n < d$). Khẳng định nào sau đây là ĐÚNG về số lượng support vectors?",
+        "options": [
+            "Sẽ có đúng $d$ support vectors.",
+            "Số lượng support vectors không thể vượt quá $n$.",
+            "Số lượng support vectors không thể vượt quá $d+1$.",
+            "Luôn luôn có ít nhất 1 support vector bị phân loại sai."
+        ],
+        "correct": 1,
+        "explanation": "Vì tổng số điểm dữ liệu trong tập huấn luyện là $n$, số lượng support vectors (là một tập con của tập huấn luyện) tối đa chỉ có thể là $n__."
+    },
+    {
+        "type": "mcq",
+        "category": "Support Vector Machine",
+        "question": "Giả sử mô hình SVM (C > 0) sau khi huấn luyện có 100 điểm dữ liệu, trong đó có 20 support vectors. Nếu ta loại bỏ 80 điểm không phải là support vectors và huấn luyện lại SVM từ đầu với cùng siêu tham số, điều gì sẽ xảy ra với siêu mặt phẳng phân chia mới?",
+        "options": [
+            "Siêu mặt phẳng mới sẽ giống hệt siêu mặt phẳng cũ.",
+            "Lề (margin) của siêu mặt phẳng mới sẽ lớn hơn.",
+            "Lề (margin) của siêu mặt phẳng mới sẽ nhỏ hơn.",
+            "Số lượng support vectors của mô hình mới sẽ ít hơn 20."
+        ],
+        "correct": 0,
+        "explanation": "Chỉ có các support vectors mới định hình siêu mặt phẳng quyết định. Các điểm không phải là support vector nằm ngoài vùng lề và có $\\alpha_i = 0$, không đóng góp vào hàm mục tiêu. Do đó, loại bỏ chúng không làm thay đổi siêu mặt phẳng."
+    },
+    {
+        "type": "mcq",
+        "category": "Support Vector Machine",
+        "question": "Về mặt hình học, ý nghĩa của số hạng $\\frac{1}{2} ||w||^2$ trong hàm mục tiêu nguyên thủy (primal objective) của Hard-Margin SVM là gì?",
+        "options": [
+            "Để cực đại hóa độ rộng của lề (margin), vì margin $M = \\frac{1}{||w||}$.",
+            "Để cực tiểu hóa độ rộng của lề, vì margin $M = ||w||$.",
+            "Để cân bằng số lượng support vectors giữa hai lớp.",
+            "Để đảm bảo siêu mặt phẳng đi qua gốc tọa độ."
+        ],
+        "correct": 0,
+        "explanation": "Độ rộng lề hình học (geometric margin) giữa hai mặt phẳng lề (positive và negative) là $\\frac{2}{||w||}$. Để cực đại hóa lề, ta cần cực tiểu hóa $||w||$, điều này tương đương với việc cực tiểu hóa $\\frac{1}{2} ||w||^2$ nhằm thuận tiện cho việc lấy đạo hàm."
+    },
+    {
+        "type": "mcq",
+        "category": "Support Vector Machine",
+        "question": "Thuật toán One-Class SVM thường được sử dụng cho mục đích gì?",
+        "options": [
+            "Phân loại đa lớp (Multi-class classification).",
+            "Hồi quy tuyến tính (Linear regression).",
+            "Phát hiện bất thường (Anomaly/Outlier Detection).",
+            "Giảm chiều dữ liệu (Dimensionality Reduction)."
+        ],
+        "correct": 2,
+        "explanation": "One-Class SVM là một thuật toán học không giám sát (unsupervised), tìm kiếm một siêu mặt phẳng (trong không gian đặc trưng) tách biệt dữ liệu với gốc tọa độ với lề lớn nhất. Nó thường được dùng để ước lượng miền hỗ trợ của phân phối dữ liệu, phục vụ cho việc phát hiện điểm bất thường."
+    },
+    {
+        "type": "mcq",
+        "category": "Support Vector Machine",
+        "question": "Tham số siêu điều chỉnh (hyperparameter) $C$ trong Soft-Margin SVM đóng vai trò gì?",
+        "options": [
+            "Đóng vai trò điều chỉnh kích thước bước học (learning rate).",
+            "Đóng vai trò đánh đổi giữa việc tối đa hóa lề (margin) và giảm thiểu lỗi phân loại trên tập huấn luyện.",
+            "Quyết định bậc của đa thức trong Polynomial Kernel.",
+            "Xác định độ dốc của hàm kích hoạt (activation function)."
+        ],
+        "correct": 1,
+        "explanation": "$C$ là hằng số phạt (penalty cost) cho các điểm vi phạm lề (slack variables $\\xi_i$). Khi $C$ lớn, mô hình phạt nặng các lỗi phân loại $\\implies$ lề hẹp, dễ overfitting. Khi $C$ nhỏ, mô hình cho phép nhiều vi phạm hơn $\\implies$ lề rộng, thiên về underfitting."
+    },
+    {
+        "type": "mcq",
+        "category": "Random Forest",
+        "question": "Random Forest sử dụng kỹ thuật Bagging (Bootstrap Aggregating) kết hợp với chọn ngẫu nhiên tập con đặc trưng (feature subspace) tại mỗi nút tách (node split). Mục đích CHÍNH của việc chọn ngẫu nhiên tập con đặc trưng này là gì?",
+        "options": [
+            "Giảm độ chệch (Bias) của các cây quyết định.",
+            "Tăng tốc độ tính toán tại mỗi nút tách.",
+            "Giảm sự tương quan (correlation) giữa các cây, từ đó làm giảm phương sai (Variance) của mô hình tổng thể.",
+            "Đảm bảo mọi đặc trưng đều được sử dụng ít nhất một lần."
+        ],
+        "correct": 2,
+        "explanation": "Nếu luôn dùng tất cả các features, các đặc trưng trội (strong predictors) sẽ luôn được chọn ở các root nodes của mọi cây, làm cho các cây rất giống nhau (highly correlated). Việc chọn ngẫu nhiên features giúp các cây đa dạng hơn, decorrelate các cây, làm cho trung bình của chúng giảm variance mạnh hơn."
+    },
+    {
+        "type": "mcq",
+        "category": "Random Forest",
+        "question": "Hệ số Gini Impurity của một nút lá có phân bố xác suất cho 2 lớp là $p_1 = 0.5$ và $p_2 = 0.5$ là bao nhiêu?",
+        "options": [
+            "1.0",
+            "0.5",
+            "0.25",
+            "0.0"
+        ],
+        "correct": 1,
+        "explanation": "Gini Impurity được tính bằng $G = \\sum_{i=1}^C p_i(1 - p_i) = 1 - \\sum_{i=1}^C p_i^2$. Thay $p_1 = 0.5, p_2 = 0.5$, ta có $G = 1 - (0.5^2 + 0.5^2) = 1 - 0.5 = 0.5$."
+    },
+    {
+        "type": "mcq",
+        "category": "Random Forest",
+        "question": "Shannon Entropy của một biến ngẫu nhiên nhị phân (2 lớp) đạt giá trị cực đại là bao nhiêu (sử dụng logarit cơ số 2)?",
+        "options": [
+            "0.5",
+            "1.0",
+            "2.0",
+            "e"
+        ],
+        "correct": 1,
+        "explanation": "Entropy $H = -\\sum p_i \\log_2(p_i)$. Khi $p_1 = p_2 = 0.5$ (phân bố đều), $H = -0.5 \\log_2(0.5) - 0.5 \\log_2(0.5) = 0.5 + 0.5 = 1.0$."
+    },
+    {
+        "type": "mcq",
+        "category": "Random Forest",
+        "question": "Lỗi OOB (Out-Of-Bag Error) trong Random Forest được tính toán như thế nào?",
+        "options": [
+            "Bằng cách chia tập dữ liệu thành K-folds và tính lỗi trên tập validation.",
+            "Sử dụng các mẫu không được chọn (khoảng 36.8%) trong quá trình Bootstrap của mỗi cây để đánh giá hiệu suất cây đó, rồi trung bình kết quả trên toàn rừng.",
+            "Lấy một tập test hoàn toàn độc lập và không liên quan đến tập train.",
+            "Đánh giá trực tiếp trên các mẫu Bootstrap (In-bag samples) của từng cây."
+        ],
+        "correct": 1,
+        "explanation": "Trong Bootstrap, xác suất một mẫu không được chọn vào tập huấn luyện của 1 cây là $(1 - 1/n)^n \\approx 1/e \\approx 36.8\\%$. Những mẫu này gọi là Out-Of-Bag samples và được dùng làm tập kiểm định nội bộ (validation) để ước lượng lỗi tổng quát hóa mà không cần tập validation rời."
+    },
+    {
+        "type": "mcq",
+        "category": "Random Forest",
+        "question": "Trong Random Forest, độ đo tầm quan trọng đặc trưng (Feature Importance) theo Gini (Mean Decrease Gini) có một nhược điểm lớn khi tập dữ liệu có chứa cả biến phân loại (categorical) và biến liên tục. Đó là nhược điểm gì?",
+        "options": [
+            "Gini không thể xử lý được các biến phân loại.",
+            "Nó thường thiên vị (bias) và gán độ quan trọng cao hơn cho các đặc trưng có số lượng giá trị duy nhất lớn (high cardinality).",
+            "Giá trị Mean Decrease Gini luôn âm đối với các biến liên tục.",
+            "Nó không phản ánh đúng ảnh hưởng của biến số nếu không sử dụng cross-validation."
+        ],
+        "correct": 1,
+        "explanation": "Các đặc trưng có high cardinality (nhiều giá trị riêng biệt) tạo ra nhiều cơ hội hơn để tìm một điểm tách (split) làm giảm Gini trên tập huấn luyện. Do đó, mô hình thường ưu tiên và đánh giá cao (overestimate) các đặc trưng này, ngay cả khi chúng là nhiễu."
+    },
+    {
+        "type": "mcq",
+        "category": "Random Forest",
+        "question": "Extremely Randomized Trees (Extra-Trees) khác với Random Forest truyền thống ở điểm mấu chốt nào trong việc tạo các nút tách (node splits)?",
+        "options": [
+            "Extra-Trees sử dụng toàn bộ tập đặc trưng thay vì một tập con ngẫu nhiên.",
+            "Extra-Trees sử dụng ngưỡng tách (split threshold) ngẫu nhiên thay vì tìm ngưỡng tối ưu cắt Information Gain tối đa.",
+            "Extra-Trees sử dụng hàm mất mát Log Loss thay vì Gini.",
+            "Extra-Trees là mô hình Boosting."
+        ],
+        "correct": 1,
+        "explanation": "Extra-Trees khác Random Forest ở việc chọn điểm cắt ngẫu nhiên cho các feature được lấy ngẫu nhiên thay vì quét toàn bộ các điểm cắt để tìm ra điểm mang lại Gini decrease cao nhất, làm giảm thêm Variance."
+    },
+    {
+        "type": "mcq",
+        "category": "Random Forest",
+        "question": "Nếu số lượng cây trong mô hình Random Forest tiến tới vô cực, điều gì sẽ xảy ra với mô hình?",
+        "options": [
+            "Mô hình sẽ bị Overfitting trầm trọng.",
+            "Lỗi tổng quát hóa (Generalization Error) sẽ hội tụ về một giới hạn trên, mô hình sẽ không bị overfitting thêm do số lượng cây tăng.",
+            "Thời gian dự đoán (Inference time) sẽ giảm xuống.",
+            "Mô hình trở thành bộ phân loại tuyến tính."
+        ],
+        "correct": 1,
+        "explanation": "Lý thuyết chứng minh bởi Breiman chỉ ra rằng, khi số lượng cây trong Random Forest tiến tới vô cùng, Generalization error hội tụ, không gây thêm overfitting. Số cây càng lớn, prediction càng ổn định (variance của prediction giảm)."
+    },
+    {
+        "type": "mcq",
+        "category": "Random Forest",
+        "question": "Để đo lường khoảng cách hoặc độ tương đồng giữa các điểm dữ liệu, Random Forest có thể xây dựng một ma trận gần gũi (Proximity Matrix). Cơ chế hoạt động của Proximity Matrix là gì?",
+        "options": [
+            "Tính khoảng cách Euclidean giữa các điểm trên tập đặc trưng gốc.",
+            "Nếu hai điểm dữ liệu kết thúc ở cùng một nút lá trong một cây, độ gần gũi của chúng được tăng lên 1.",
+            "Tính hệ số tương quan Pearson giữa các hàng dữ liệu.",
+            "Sử dụng Kernel Trick để ánh xạ dữ liệu."
+        ],
+        "correct": 1,
+        "explanation": "Sau khi huấn luyện Random Forest, mọi mẫu được đẩy qua các cây. Nếu mẫu $i$ và $j$ kết thúc ở cùng một lá trên cùng một cây, độ proximity giữa chúng tăng thêm 1, sau đó chia cho số lượng cây."
+    },
+    {
+        "type": "mcq",
+        "category": "Random Forest",
+        "question": "So với một cây quyết định đơn lẻ (Single Decision Tree), mô hình Random Forest thay đổi Bias và Variance của lỗi dự đoán như thế nào?",
+        "options": [
+            "Tăng Bias và Giảm Variance.",
+            "Giảm Bias và Tăng Variance.",
+            "Bias không đổi (hoặc tăng nhẹ), Variance giảm đáng kể.",
+            "Giảm cả Bias và Variance một cách đáng kể."
+        ],
+        "correct": 2,
+        "explanation": "Một cây quyết định chưa tỉa cành thường có Bias thấp nhưng Variance cao. Bagging giảm Variance mạnh nhờ trung bình hóa. Bootstrap có thể khiến Bias tăng nhẹ nhưng mức giảm Variance vượt trội."
+    },
+    {
+        "type": "mcq",
+        "category": "Random Forest",
+        "question": "Information Gain tại một nút tách được tính tổng quát là $IG = Entropy(Parent) - \\sum_{i} w_i Entropy(Child_i)$. Các trọng số $w_i$ đại diện cho điều gì?",
+        "options": [
+            "Độ sâu của nút con trong cây.",
+            "Giá trị trung bình của mục tiêu tại nút con.",
+            "Tỉ lệ số lượng mẫu (fraction of samples) rơi vào nút con tương ứng trên tổng số mẫu ở nút cha.",
+            "Độ nhạy (Sensitivity) của mô hình."
+        ],
+        "correct": 2,
+        "explanation": "Trọng số $w_i = \\frac{N_i}{N_{parent}}$ là tỉ lệ số mẫu chuyển từ nút cha xuống nút con $i$. Việc nhân với $w_i$ đảm bảo ta tính được giá trị kỳ vọng của Entropy sau khi tách."
+    },
+    {
+        "type": "mcq",
+        "category": "XGBoost",
+        "question": "Thuật toán XGBoost xây dựng hàm mục tiêu bằng cách xấp xỉ hàm mất mát thông qua khai triển Taylor bậc 2. Đạo hàm bậc nhất $g_i$ và đạo hàm bậc hai $h_i$ được tính theo đại lượng nào?",
+        "options": [
+            "Theo đặc trưng đầu vào $x_i$.",
+            "Theo tham số của cây phân quyết $f_t$.",
+            "Theo nhãn thực tế $y_i$.",
+            "Theo giá trị dự đoán từ vòng lặp trước $\\hat{y}_i^{(t-1)}$."
+        ],
+        "correct": 3,
+        "explanation": "Khai triển Taylor được thực hiện xung quanh điểm $\\hat{y}_i^{(t-1)}$. Do đó, đạo hàm được lấy theo $\\hat{y}_i^{(t-1)}$."
+    },
+    {
+        "type": "mcq",
+        "category": "XGBoost",
+        "question": "Hàm mục tiêu chuẩn hóa của XGBoost ở vòng lặp $t$ có dạng $Obj = \\sum_{j=1}^T [G_j w_j + \\frac{1}{2} (H_j + \\lambda) w_j^2] + \\gamma T$. Giá trị tối ưu của trọng số lá (leaf weight) $w_j^*$ là bao nhiêu?",
+        "options": [
+            "$-\\frac{G_j}{H_j + \\lambda}$",
+            "$\\frac{G_j}{H_j + \\lambda}$",
+            "$-\\frac{H_j}{G_j + \\lambda}$",
+            "$G_j (H_j + \\lambda)$"
+        ],
+        "correct": 0,
+        "explanation": "Lấy đạo hàm của $Obj$ theo $w_j$ và cho bằng 0, ta được $G_j + (H_j + \\lambda) w_j = 0 \\implies w_j^* = -\\frac{G_j}{H_j + \\lambda}$."
+    },
+    {
+        "type": "mcq",
+        "category": "XGBoost",
+        "question": "Trong XGBoost, biểu thức đánh giá mức độ giảm của hàm mất mát (Gain) khi tách một nút thành hai nút con (Left và Right) là gì?",
+        "options": [
+            "$\\frac{1}{2} \\left[ \\frac{G_L^2}{H_L + \\lambda} + \\frac{G_R^2}{H_R + \\lambda} - \\frac{(G_L + G_R)^2}{H_L + H_R + \\lambda} \\right] - \\gamma$",
+            "$\\frac{1}{2} \\left[ \\frac{G_L}{H_L} + \\frac{G_R}{H_R} - \\frac{G_L + G_R}{H_L + H_R} \\right]$",
+            "$\\frac{G_L^2 + G_R^2}{H_L + H_R + \\lambda} - \\gamma$",
+            "$(G_L + G_R) - (H_L + H_R) - \\lambda$"
+        ],
+        "correct": 0,
+        "explanation": "Gain tỉ lệ thuận nghịch với hàm mục tiêu tối ưu $-\\frac{1}{2}\\frac{G^2}{H+\\lambda}$, độ tăng lợi ích trừ đi mức phạt $\\gamma$ do thêm 1 lá mới."
+    },
+    {
+        "type": "mcq",
+        "category": "XGBoost",
+        "question": "XGBoost xử lý giá trị khuyết thiếu (Missing Values) thông qua cơ chế Sparsity-Aware Split Finding. Cơ chế đó hoạt động như thế nào?",
+        "options": [
+            "Thay thế bằng giá trị trung bình (mean) của cột.",
+            "Tạo một nhánh phân quyết thứ ba dành riêng cho dữ liệu thiếu.",
+            "Học ngầm một 'hướng mặc định' cho dữ liệu thiếu ở mỗi nút bằng cách đẩy toàn bộ dữ liệu thiếu sang trái rồi sang phải và chọn hướng có Gain lớn hơn.",
+            "Bỏ qua (drop) các mẫu có chứa giá trị khuyết thiếu."
+        ],
+        "correct": 2,
+        "explanation": "Ở mỗi bước tìm split point, XGBoost tính Gain trong cả hai trường hợp: gán tất cả dữ liệu missing vào nhánh trái hoặc nhánh phải. Hướng nào mang lại Gain cao nhất sẽ được giữ làm hướng mặc định."
+    },
+    {
+        "type": "mcq",
+        "category": "XGBoost",
+        "question": "Tham số $\\eta$ (Learning Rate / Shrinkage) trong XGBoost đóng vai trò gì?",
+        "options": [
+            "Giảm sự đóng góp của mỗi cây mới theo tỷ lệ $\\eta$ để làm mô hình hội tụ chậm hơn, giúp giảm overfitting.",
+            "Tốc độ di chuyển dọc gradient trong hàm cập nhật Adam.",
+            "Tỷ lệ số lượng mẫu dùng cho mỗi cây.",
+            "Mức độ Regularization L1."
+        ],
+        "correct": 0,
+        "explanation": "Learning rate (shrinkage) nhân $\\eta$ với trọng số $w$ của cây mới, giảm mức độ ảnh hưởng của nó và ép mô hình phải học chậm hơn bằng nhiều cây hơn."
+    },
+    {
+        "type": "mcq",
+        "category": "XGBoost",
+        "question": "Khác biệt cơ bản giữa XGBoost và thuật toán AdaBoost truyền thống (phân loại nhị phân) là gì?",
+        "options": [
+            "AdaBoost sử dụng deep trees, còn XGBoost dùng gốc cây (stumps).",
+            "AdaBoost tối ưu hàm mất mát bằng cách điều chỉnh trọng số mẫu (sample weights) ở mỗi bước, còn XGBoost xấp xỉ phần dư (residuals) bằng Gradient Descent.",
+            "AdaBoost chạy song song được, XGBoost thì không.",
+            "XGBoost không phải là thuật toán Ensemble."
+        ],
+        "correct": 1,
+        "explanation": "AdaBoost tăng trọng số của mẫu phân loại sai. XGBoost là Gradient Boosting, fit cây mới vào giá trị Gradient (và Hessian) của hàm mất mát."
+    },
+    {
+        "type": "mcq",
+        "category": "XGBoost",
+        "question": "Thuật toán Approximate Greedy Algorithm trong XGBoost sử dụng 'Weighted Quantile Sketch'. Việc chia (split) được đánh trọng số dựa trên đại lượng nào?",
+        "options": [
+            "Giá trị của hàm Gradient $g_i$.",
+            "Giá trị của hàm Hessian $h_i$.",
+            "Xác suất dự đoán từ mô hình.",
+            "Nghịch đảo của tần suất lớp."
+        ],
+        "correct": 1,
+        "explanation": "Hàm mục tiêu có thể đưa về dạng Weighted Least Squares, nơi Hessian $h_i$ đóng vai trò là trọng số (weight). Do đó thuật toán chia quantile theo tổng trọng số $h_i$."
+    },
+    {
+        "type": "mcq",
+        "category": "XGBoost",
+        "question": "Tham số `min_child_weight` trong XGBoost là tổng trọng số (Hessian) tối thiểu cần thiết để giữ một nút. Trong hồi quy sử dụng MSE, tham số này tương đương với:",
+        "options": [
+            "Giá trị dự đoán trung bình của nút.",
+            "Số lượng điểm dữ liệu tối thiểu trong nút con (min_samples_leaf).",
+            "Phương sai của các mục tiêu trong nút.",
+            "L2 regularization của lá."
+        ],
+        "correct": 1,
+        "explanation": "Với MSE, đạo hàm bậc 2 của loss function $L(y, \\hat{y}) = \\frac{1}{2}(y-\\hat{y})^2$ là $h_i = 1$. Vậy $\\sum h_i$ chính là số lượng điểm dữ liệu trong lá."
+    },
+    {
+        "type": "mcq",
+        "category": "XGBoost",
+        "question": "Thiết kế 'Cache-aware Access' trong XGBoost giải quyết vấn đề hệ thống nào?",
+        "options": [
+            "Tắc nghẽn mạng trong phân tán.",
+            "Disk I/O khi lưu bộ nhớ đệm.",
+            "Truy cập bộ nhớ ngẫu nhiên không liên tục (non-continuous memory access) khi lấy gradient và hessian theo dữ liệu cột đã được sắp xếp.",
+            "Giới hạn dung lượng RAM tối đa."
+        ],
+        "correct": 2,
+        "explanation": "XGBoost lưu dữ liệu ở dạng cột sắp xếp. Duyệt các giá trị này để lấy $g_i, h_i$ dẫn đến truy cập bộ nhớ không tuần tự (cache misses). XGBoost cấp phát thread-local buffer để gom các số liệu này nhằm tối ưu L1/L2 cache."
+    },
+    {
+        "type": "mcq",
+        "category": "XGBoost",
+        "question": "Đại lượng $\\gamma$ (min_split_loss) trong XGBoost đóng vai trò Pre-pruning. Khi nào một split sẽ bị từ chối dựa vào $\\gamma$?",
+        "options": [
+            "Khi giá trị dự đoán của lá lớn hơn $\\gamma$.",
+            "Khi lượng Gain gia tăng nhỏ hơn $\\gamma$.",
+            "Khi độ sâu lớn hơn $\\gamma$.",
+            "Khi số lượng dữ liệu nhỏ hơn $\\gamma$."
+        ],
+        "correct": 1,
+        "explanation": "Trong công thức Gain có phần trừ $\\gamma$. Nếu Gain nguyên thủy nhỏ hơn $\\gamma$, tổng Gain $< 0$, XGBoost sẽ bỏ qua split này."
+    },
+    {
+        "type": "mcq",
+        "category": "PCA & K-Means",
+        "question": "Trong Phân tích Thành phần Chính (PCA), các hướng của thành phần chính (Principal Components) ứng với điều gì của ma trận hiệp phương sai (Covariance Matrix)?",
+        "options": [
+            "Các giá trị riêng (Eigenvalues).",
+            "Các vector riêng (Eigenvectors).",
+            "Đường chéo chính của ma trận.",
+            "Nghịch đảo của ma trận."
+        ],
+        "correct": 1,
+        "explanation": "Bài toán PCA dẫn đến việc giải hệ trị riêng cho ma trận hiệp phương sai. Các trục chính (principal directions) chính là các Eigenvectors."
+    },
+    {
+        "type": "mcq",
+        "category": "PCA & K-Means",
+        "question": "Tỷ lệ phương sai giải thích (Explained Variance Ratio) của $k$ thành phần chính đầu tiên trong PCA được tính toán thế nào?",
+        "options": [
+            "$\\frac{\\sum_{i=1}^k \\lambda_i^2}{\\sum_{j=1}^d \\lambda_j^2}$",
+            "$\\frac{\\sum_{i=1}^k \\lambda_i}{\\sum_{j=1}^d \\lambda_j}$",
+            "$\\frac{\\max_{i=1}^k \\lambda_i}{\\sum_{j=1}^d \\lambda_j}$",
+            "$\\frac{k}{d}$"
+        ],
+        "correct": 1,
+        "explanation": "Phương sai dọc theo mỗi trục chính bằng eigenvalue $\\lambda_i$. Tổng phương sai của toàn bộ dữ liệu bằng tổng tất cả các $\\lambda$."
+    },
+    {
+        "type": "mcq",
+        "category": "PCA & K-Means",
+        "question": "Khi áp dụng phân tích SVD trên ma trận dữ liệu $X$ (đã trừ mean): $X = U \\Sigma V^T$. Ma trận nào chứa các Principal Components?",
+        "options": [
+            "Ma trận $U$.",
+            "Ma trận $V$.",
+            "Ma trận $\\Sigma$.",
+            "Tích $U \\Sigma$."
+        ],
+        "correct": 1,
+        "explanation": "Ma trận hiệp phương sai $C = \\frac{1}{N-1} X^T X = V (\\frac{\\Sigma^2}{N-1}) V^T$. Các cột của $V$ (Right singular vectors) chính là các Eigenvectors của $C$ (tức là Principal Components)."
+    },
+    {
+        "type": "mcq",
+        "category": "PCA & K-Means",
+        "question": "Kernel PCA vượt trội hơn PCA truyền thống ở điểm nào?",
+        "options": [
+            "Nhanh hơn rất nhiều với bộ dữ liệu khổng lồ.",
+            "Tự động chống nhiễu (outliers).",
+            "Trích xuất các đặc trưng phi tuyến (non-linear) bằng cách ánh xạ ngầm dữ liệu lên không gian chiều cao hơn.",
+            "Tự động quyết định số lượng $k$."
+        ],
+        "correct": 2,
+        "explanation": "Bằng việc sử dụng Kernel trick, thuật toán thực hiện PCA trong không gian đặc trưng phi tuyến, cho phép tách/trích xuất các cấu trúc dữ liệu không tuyến tính (như hình đồng tâm)."
+    },
+    {
+        "type": "mcq",
+        "category": "PCA & K-Means",
+        "question": "Hàm mục tiêu WCSS (Within-Cluster Sum of Squares) hay Inertia của thuật toán K-Means là gì?",
+        "options": [
+            "$\\sum_{k=1}^K \\sum_{x_i \\in C_k} ||x_i - \\mu_k||_1$",
+            "$\\sum_{k=1}^K \\sum_{x_i \\in C_k} ||x_i - \\mu_k||^2$",
+            "Khoảng cách giữa các tâm $\\mu_k$.",
+            "Khoảng cách Cosine."
+        ],
+        "correct": 1,
+        "explanation": "K-Means tối thiểu hóa tổng bình phương khoảng cách Euclidean từ mỗi điểm dữ liệu đến tâm cụm mà nó thuộc về: $\\sum ||x_i - \\mu_k||^2$."
+    },
+    {
+        "type": "mcq",
+        "category": "PCA & K-Means",
+        "question": "Khởi tạo K-Means++ giải quyết vấn đề gì của thuật toán K-Means tiêu chuẩn?",
+        "options": [
+            "Khắc phục việc hội tụ vào cực tiểu cục bộ tồi tệ bằng cách chọn tâm cụm phân tán rộng (xác suất tỉ lệ thuận với bình phương khoảng cách đến tâm đã có).",
+            "Cho phép xử lý dữ liệu categorical.",
+            "Xác định tối ưu giá trị $K$.",
+            "Làm giảm số vòng lặp tối đa xuống $O(1)$."
+        ],
+        "correct": 0,
+        "explanation": "K-Means++ khởi tạo các centroid bằng cách chọn tâm tiếp theo cách xa các tâm trước đó, hạn chế tối đa nguy cơ các centroid tập trung ở cùng 1 cụm gốc."
+    },
+    {
+        "type": "mcq",
+        "category": "PCA & K-Means",
+        "question": "Cho $a$ là khoảng cách trung bình nội bộ cụm (cohesion) và $b$ là khoảng cách trung bình đến cụm lân cận gần nhất (separation). Công thức hệ số Silhouette là:",
+        "options": [
+            "$\\frac{a - b}{\\max(a, b)}$",
+            "$\\frac{b - a}{\\max(a, b)}$",
+            "$\\frac{a + b}{\\min(a, b)}$",
+            "$b - a$"
+        ],
+        "correct": 1,
+        "explanation": "Silhouette score = $\\frac{b - a}{\\max(a, b)}$. Giá trị càng gần 1 (nghĩa là $b \\gg a$) thì phân cụm càng chuẩn xác."
+    },
+    {
+        "type": "mcq",
+        "category": "PCA & K-Means",
+        "question": "Mối quan hệ toán học giữa K-Means và Gaussian Mixture Models (GMM) là gì?",
+        "options": [
+            "K-Means tổng quát hóa GMM với ma trận hiệp phương sai đầy đủ.",
+            "K-Means tương đương với thuật toán EM cho GMM trong trường hợp các spherical Gaussians có $\\sigma^2 \\to 0$.",
+            "GMM dùng Hard-assignment, K-Means dùng Soft-assignment.",
+            "Chúng không có liên hệ gì."
+        ],
+        "correct": 1,
+        "explanation": "Khi phương sai của các phân phối Gaussian trong GMM tiến về 0, xác suất thuộc về một cụm của điểm dữ liệu tiến về 1 đối với cụm gần nhất và 0 với cụm khác. Lúc này EM trở thành thuật toán Lloyd của K-Means."
+    },
+    {
+        "type": "mcq",
+        "category": "PCA & K-Means",
+        "question": "Tại sao K-Means gặp khó khăn lớn trên các tập dữ liệu có dạng hình đa tạp cong (như Two Moons)?",
+        "options": [
+            "K-Means chỉ chia không gian theo các siêu mặt phẳng lồi (Voronoi) tuyến tính dựa trên khoảng cách Euclidean.",
+            "Thuật toán K-Means không sử dụng đạo hàm.",
+            "Khoảng cách Manhattan bị lỗi với dạng cong.",
+            "K-Means yêu cầu số cụm $K$ rất lớn."
+        ],
+        "correct": 0,
+        "explanation": "Biểu đồ Voronoi tạo thành từ khoảng cách Euclidean chia không gian thành các vùng lồi. K-Means không thể bao bọc dữ liệu hình dạng lõm, vòng cung hay đồng tâm."
+    },
+    {
+        "type": "mcq",
+        "category": "PCA & K-Means",
+        "question": "Việc giữ lại $k$ thành phần chính trong PCA đồng nghĩa với việc tối ưu hóa đại lượng hình học nào?",
+        "options": [
+            "Tối đa hóa khoảng cách giữa các điểm trong không gian mới.",
+            "Tối thiểu hóa tổng bình phương sai số tái tạo (Reconstruction Error) giữa dữ liệu gốc và dữ liệu chiếu.",
+            "Tối đa hóa Kurtosis.",
+            "Tối thiểu hóa số chiều độc lập tuyến tính."
+        ],
+        "correct": 1,
+        "explanation": "Theo định lý Eckart-Young-Mirsky, việc chiếu trực giao xuống không gian con sinh bởi $k$ eigenvector hàng đầu sẽ tối thiểu hóa $||X - X_{approx}||^2_F$."
+    },
+    {
+        "type": "mcq",
+        "category": "Evaluation Metrics",
+        "question": "Diện tích dưới đường cong ROC (ROC-AUC) tương đương với xác suất nào sau đây?",
+        "options": [
+            "Xác suất dự đoán đúng một điểm dữ liệu bất kỳ.",
+            "Tỷ lệ giữa True Positives và False Positives.",
+            "Xác suất mô hình cho điểm (score) của một mẫu Positive được chọn ngẫu nhiên cao hơn một mẫu Negative được chọn ngẫu nhiên.",
+            "Xác suất mô hình không bị quá khớp (overfit)."
+        ],
+        "correct": 2,
+        "explanation": "ROC-AUC toán học bằng chính xác giá trị của thống kê Mann-Whitney U, tức là $P(score(X_{pos}) > score(X_{neg}))$."
+    },
+    {
+        "type": "mcq",
+        "category": "Evaluation Metrics",
+        "question": "Trong dữ liệu mất cân bằng nặng (99% Negative, 1% Positive), tại sao Precision-Recall (PR) Curve tốt hơn ROC Curve?",
+        "options": [
+            "ROC không tính FPR được do mẫu số bằng 0.",
+            "Trong ROC, False Positives (FP) bị che lấp do chia cho số True Negatives (TN) quá lớn, khiến FPR luôn rất nhỏ và đồ thị có vẻ lạc quan.",
+            "PR Curve loại bỏ hoàn toàn ảnh hưởng của True Positives.",
+            "PR Curve mặc định ưu tiên lớp Negative."
+        ],
+        "correct": 1,
+        "explanation": "FPR = FP / (FP + TN). Khi TN rất lớn, việc tăng mạnh FP (phân loại sai rất nhiều Negative thành Positive) hầu như không làm thay đổi FPR đáng kể. Ngược lại, Precision = TP / (TP + FP) sẽ phản ứng dữ dội và tụt giảm ngay lập tức."
+    },
+    {
+        "type": "mcq",
+        "category": "Evaluation Metrics",
+        "question": "Tại sao F1-Score dùng Trung bình điều hòa (Harmonic Mean) giữa Precision và Recall thay vì Trung bình cộng?",
+        "options": [
+            "Bởi vì trung bình điều hòa trừng phạt nặng khi một trong hai chỉ số (Precision hoặc Recall) cực kỳ thấp (gần 0).",
+            "Vì hai đại lượng này có đơn vị khác nhau.",
+            "Vì nó giúp thuật toán hội tụ nhanh hơn.",
+            "Vì F1 luôn phải nhỏ hơn mức 0.5."
+        ],
+        "correct": 0,
+        "explanation": "Trung bình điều hòa nghiêng về số nhỏ hơn. Nếu Precision = 1.0 và Recall = 0.0, trung bình cộng = 0.5 nhưng Harmonic mean = 0. Nó đảm bảo cả 2 chỉ số phải cao cân bằng."
+    },
+    {
+        "type": "mcq",
+        "category": "Evaluation Metrics",
+        "question": "Brier Score được dùng để đánh giá độ hiệu chuẩn (calibration) của xác suất dự đoán. Công thức tính Brier Score cho phân loại nhị phân (với $y_i \\in \\{0, 1\\}$ và dự đoán $p_i$) là:",
+        "options": [
+            "$\\frac{1}{N} \\sum_{i=1}^N -[y_i \\log(p_i) + (1-y_i) \\log(1-p_i)]$",
+            "$\\frac{1}{N} \\sum_{i=1}^N (p_i - y_i)^2$",
+            "$\\frac{1}{N} \\sum_{i=1}^N |p_i - y_i|$",
+            "$\\max_{i} |p_i - y_i|$"
+        ],
+        "correct": 1,
+        "explanation": "Brier Score chính là MSE (Mean Squared Error) đo độ lệch giữa xác suất dự đoán $p_i$ và nhãn cứng thực tế $y_i$."
+    },
+    {
+        "type": "mcq",
+        "category": "Overfitting",
+        "question": "Về mặt hình học, lý do chính khiến L1 Regularization (Lasso) đưa nhiều trọng số $w_i$ về đúng 0 là gì?",
+        "options": [
+            "Hàm L1 là hàm mũ.",
+            "Vùng miền ràng buộc (feasible region) của L1 (hình thoi/polytope) có các 'đỉnh' nhọn nằm trên các trục tọa độ. Các đường đồng mức của hàm mất mát thường tiếp xúc tại chính các đỉnh này.",
+            "L1 lấy đạo hàm bậc hai ra giá trị lớn.",
+            "L1 biến đổi dữ liệu thành các vector trực giao."
+        ],
+        "correct": 1,
+        "explanation": "Không gian ràng buộc của norm L1 là một polytope đa chiều (VD: hình thoi). Xác suất để elip tiếp xúc vào các điểm nhọn (đỉnh nằm ngay trên trục) cao hơn rất nhiều so với cạnh trơn, làm cho các tham số rơi thẳng vào mốc 0."
+    },
+    {
+        "type": "mcq",
+        "category": "Overfitting",
+        "question": "Đồ thị Learning Curves cho thấy Training Error và Validation Error hội tụ về cùng một mức lỗi rất CAO (ví dụ 45%). Kết luận nào đúng?",
+        "options": [
+            "Mô hình Overfitting (High Variance).",
+            "Mô hình Underfitting (High Bias), không đủ độ phức tạp.",
+            "Cần bổ sung thêm dữ liệu (Add more training data).",
+            "Data Leakage xảy ra."
+        ],
+        "correct": 1,
+        "explanation": "Cả hai đường cùng gặp nhau ở mức lỗi lớn chứng tỏ mô hình không có khả năng học (không nắm bắt được quy luật dữ liệu), còn gọi là High Bias hay Underfitting. Thêm dữ liệu không giúp ích, phải tăng độ phức tạp mô hình."
+    },
+    {
+        "type": "mcq",
+        "category": "Overfitting",
+        "question": "Trong chiến lược Early Stopping để chống Overfitting, mô hình nên dừng huấn luyện ở thời điểm nào?",
+        "options": [
+            "Khi Training Loss bắt đầu tăng nhẹ.",
+            "Khi Validation Loss có dấu hiệu bắt đầu tăng lên đều đặn.",
+            "Ngay sau Epoch đầu tiên Validation Loss không giảm.",
+            "Khi Training Loss bằng 0."
+        ],
+        "correct": 1,
+        "explanation": "Validation Loss là đại diện gần nhất cho Generalization Error. Khi nó bắt đầu phân kỳ (tăng lên) so với Training Loss (vẫn đang giảm), đó là lúc mô hình ghi nhớ nhiễu. Thường chờ thêm một 'patience' để chắc chắn nó thực sự tăng lên."
+    },
+    {
+        "type": "mcq",
+        "category": "Overfitting",
+        "question": "Khi áp dụng Leave-One-Out Cross Validation (LOOCV, tức K = N), đặc điểm của Estimation Error về mặt Bias và Variance là gì?",
+        "options": [
+            "Bias cao, Variance thấp.",
+            "Bias thấp, Variance cao.",
+            "Bias thấp, Variance thấp.",
+            "Bias cao, Variance cao."
+        ],
+        "correct": 1,
+        "explanation": "Vì các tập train gần như y hệt toàn bộ tập data gốc (chỉ thiếu 1 mẫu), Bias (độ chệch) rất thấp. Tuy nhiên, các mô hình con học được cực kỳ tương quan với nhau, dẫn đến Variance (phương sai) của ước lượng cực lớn."
+    },
+    {
+        "type": "mcq",
+        "category": "Overfitting",
+        "question": "Hiện tượng 'Curse of Dimensionality' làm các thuật toán đo khoảng cách như K-Means trở nên vô dụng theo cách nào?",
+        "options": [
+            "Nó làm cho khoảng cách giữa điểm gần nhất và điểm xa nhất tiến về bằng nhau, khiến khái niệm 'lân cận' bị xóa nhòa.",
+            "Nó gây tràn bộ nhớ ngẫu nhiên.",
+            "Nó tự động đưa tất cả các đặc trưng về phân phối Gaussian.",
+            "Nó khiến phương sai bằng 0."
+        ],
+        "correct": 0,
+        "explanation": "Ở số chiều rất cao, $\\lim_{d \\to \\infty} \\frac{d_{max} - d_{min}}{d_{min}} = 0$. Mọi điểm đều cách xa nhau một khoảng gần bằng nhau, không còn khái niệm điểm gần và điểm xa."
+    },
+    {
+        "type": "mcq",
+        "category": "Overfitting",
+        "question": "Cost-Complexity Pruning (tỉa cành) cho Decision Tree bổ sung hằng số phạt $\\alpha |T|$ vào hàm lỗi. Đại lượng $|T|$ biểu diễn gì?",
+        "options": [
+            "Số lượng dữ liệu trong tập train.",
+            "Số lượng nút lá (terminal nodes) của cây, đại diện cho độ phức tạp.",
+            "Độ sâu của gốc cây.",
+            "Information Gain."
+        ],
+        "correct": 1,
+        "explanation": "$|T|$ chính là số nút lá. Nhiều nút lá đồng nghĩa cây phức tạp (overfit). Việc phạt $|T|$ giúp ưu tiên các cây nhỏ, có khả năng tổng quát hóa tốt hơn."
+    }
+]
 ];
