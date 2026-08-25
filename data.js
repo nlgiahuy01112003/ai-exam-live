@@ -1098,10 +1098,7 @@ const quizData = [
         "correct": 1,
         "explanation": "Demographic parity simply demands that $P(\\hat{Y}=1 | A=0) = P(\\hat{Y}=1 | A=1)$, meaning the model approves loans (for example) at the same rate for both groups, ignoring actual creditworthiness. Equalized odds demands fairness conditional on the true label: $P(\\hat{Y}=1 | Y=y, A=0) = P(\\hat{Y}=1 | Y=y, A=1)$, meaning qualified individuals from both groups have the same chance of approval, and unqualified individuals have the same chance of rejection."
     }
-]
-,
-
-    {
+, {
         "type": "mcq",
         "category": "NumPy - Memory Optimization",
         "question": "Cho mảng `X` kích thước $1000 \\times 1000$ kiểu `float64`. Khi thực hiện `Y = X[::2, ::2]`, `Y` là view hay copy, và dung lượng bộ nhớ cấp phát thêm xấp xỉ bao nhiêu?",
@@ -1751,10 +1748,7 @@ const quizData = [
         "correct": 1,
         "explanation": "Trong môi trường Production/Cross-validation, rất hay gặp class categoricals bị bỏ sót trong train set. `handle_unknown='ignore'` giúp Pipeline không bị crash."
     }
-]
-,
-
-    {
+, {
         "type": "mcq",
         "category": "Support Vector Machine",
         "question": "Trong bài toán tối ưu đối ngẫu (dual problem) của SVM lề mềm, hàm mục tiêu cần tối đa hóa phụ thuộc vào các nhân tử Lagrange $\\alpha_i$. Theo điều kiện KKT, một điểm dữ liệu $x_i$ có $0 < \\alpha_i < C$ sẽ có tính chất hình học nào sau đây?",
@@ -2404,5 +2398,4 @@ const quizData = [
         "correct": 1,
         "explanation": "$|T|$ chính là số nút lá. Nhiều nút lá đồng nghĩa cây phức tạp (overfit). Việc phạt $|T|$ giúp ưu tiên các cây nhỏ, có khả năng tổng quát hóa tốt hơn."
     }
-]
 ];
