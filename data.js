@@ -1099,4 +1099,657 @@ const quizData = [
         "explanation": "Demographic parity simply demands that $P(\\hat{Y}=1 | A=0) = P(\\hat{Y}=1 | A=1)$, meaning the model approves loans (for example) at the same rate for both groups, ignoring actual creditworthiness. Equalized odds demands fairness conditional on the true label: $P(\\hat{Y}=1 | Y=y, A=0) = P(\\hat{Y}=1 | Y=y, A=1)$, meaning qualified individuals from both groups have the same chance of approval, and unqualified individuals have the same chance of rejection."
     }
 ]
+,
+
+    {
+        "type": "mcq",
+        "category": "NumPy - Memory Optimization",
+        "question": "Cho mảng `X` kích thước $1000 \\times 1000$ kiểu `float64`. Khi thực hiện `Y = X[::2, ::2]`, `Y` là view hay copy, và dung lượng bộ nhớ cấp phát thêm xấp xỉ bao nhiêu?",
+        "options": [
+            "Copy, 2MB",
+            "View, 0MB (chỉ object header)",
+            "Copy, 8MB",
+            "View, 8MB"
+        ],
+        "correct": 1,
+        "explanation": "Basic slicing trong NumPy tạo ra một view, chia sẻ cùng buffer bộ nhớ với mảng gốc. `Y` chỉ lưu thông tin metadata (shape, strides), do đó không cấp phát bộ nhớ đáng kể."
+    },
+    {
+        "type": "mcq",
+        "category": "NumPy - Optimization",
+        "question": "Để tính ma trận khoảng cách Euclidean giữa hai tập điểm `A` $(N, D)$ và `B` $(M, D)$, cách nào sau đây tối ưu bộ nhớ nhất thay vì dùng broadcasting `A[:, None, :] - B[None, :, :]`?",
+        "options": [
+            "np.linalg.norm(A[:, None] - B, axis=-1)",
+            "Khai triển $(A-B)^2 = A^2 + B^2 - 2AB^T$ bằng `np.dot`",
+            "Sử dụng vòng lặp for lồng nhau",
+            "Dùng `np.subtract.outer(A, B)`"
+        ],
+        "correct": 1,
+        "explanation": "Broadcasting `A[:, None] - B` sinh ra mảng trung gian $N \\times M \\times D$. Khai triển đại số $A^2 + B^2 - 2AB^T$ chỉ tạo ra ma trận kích thước $N \\times M$, giảm thiểu $D$ lần lượng bộ nhớ cần dùng."
+    },
+    {
+        "type": "mcq",
+        "category": "NumPy - Windowing",
+        "question": "Hàm nào trong NumPy cho phép tạo rolling window (sliding window) trên mảng 1D mà KHÔNG cần sao chép dữ liệu (trả về view)?",
+        "options": [
+            "np.roll()",
+            "np.lib.stride_tricks.as_strided()",
+            "np.convolve()",
+            "np.split()"
+        ],
+        "correct": 1,
+        "explanation": "`as_strided` thao tác trực tiếp trên bộ nhớ bằng cách điều chỉnh strides, tạo ra một view của mảng cho rolling window mà không duplicate dữ liệu."
+    },
+    {
+        "type": "mcq",
+        "category": "NumPy - Memory",
+        "question": "Sự khác biệt về bộ nhớ giữa `A = A + B` và `A += B` (giả sử A, B cùng kích thước và kiểu dữ liệu) là gì?",
+        "options": [
+            "Không có sự khác biệt.",
+            "`A += B` thực hiện in-place, không tạo mảng trung gian. `A = A + B` tạo mảng mới rồi gán lại.",
+            "`A = A + B` nhanh hơn và tối ưu hơn.",
+            "`A += B` thay đổi type của A theo B."
+        ],
+        "correct": 1,
+        "explanation": "`A += B` gọi `__iadd__` thực hiện cộng in-place, tiết kiệm bộ nhớ. `A = A + B` tạo một mảng mới chứa kết quả của `A + B` trước khi gán tham chiếu mới cho `A`."
+    },
+    {
+        "type": "mcq",
+        "category": "NumPy - Indexing",
+        "question": "Phép toán nào sau đây luôn luôn trả về một COPY của dữ liệu trong NumPy?",
+        "options": [
+            "A[1:5, :]",
+            "A[::-1]",
+            "A[A > 0]",
+            "A.reshape(-1, 2) (khi mảng contiguous)"
+        ],
+        "correct": 2,
+        "explanation": "`A[A > 0]` là Boolean/Advanced Indexing, trong NumPy kết quả của Advanced Indexing luôn luôn trả về một bản copy mới, không phải view."
+    },
+    {
+        "type": "mcq",
+        "category": "NumPy - Data Loading",
+        "question": "Để xử lý một ma trận lớn (ví dụ 50GB) không vừa RAM, công cụ nào trong NumPy cho phép đọc/ghi trực tiếp lên đĩa thay vì tải toàn bộ vào RAM?",
+        "options": [
+            "np.load()",
+            "np.memmap()",
+            "np.frombuffer()",
+            "np.fromfile()"
+        ],
+        "correct": 1,
+        "explanation": "`np.memmap` (Memory-mapped file) tạo một map của file nhị phân trên đĩa vào không gian nhớ ảo, cho phép truy cập mảng NumPy lớn mà không cần tải hết vào RAM."
+    },
+    {
+        "type": "mcq",
+        "category": "NumPy - Performance",
+        "question": "So sánh `np.where(mask, A, B)` và `A[mask] = B[mask]`. Điều nào sau đây đúng về hiệu năng và bộ nhớ?",
+        "options": [
+            "`np.where` luôn tối ưu hơn.",
+            "`np.where` tạo ra mảng kết quả mới (tốn bộ nhớ), trong khi `A[mask] = B[mask]` sửa đổi in-place nhưng có thể chậm hơn do advanced indexing.",
+            "Cả hai giống hệt nhau ở mức byte code.",
+            "`A[mask] = B[mask]` không dùng được nếu B là vô hướng."
+        ],
+        "correct": 1,
+        "explanation": "`np.where` cấp phát bộ nhớ cho toàn bộ mảng kết quả mới. `A[mask] = ...` là in-place assignment, tiết kiệm bộ nhớ nhưng tốc độ phụ thuộc vào việc copy mask/data."
+    },
+    {
+        "type": "mcq",
+        "category": "NumPy - Operations",
+        "question": "Hàm `np.einsum('ij,jk->ik', A, B)` tương đương với phép toán nào?",
+        "options": [
+            "Element-wise multiplication (A * B)",
+            "Cross product",
+            "Matrix multiplication (A @ B)",
+            "Outer product"
+        ],
+        "correct": 2,
+        "explanation": "Chuỗi Einstein summation `'ij,jk->ik'` tính tổng theo trục `j`, chính là định nghĩa chuẩn của nhân ma trận (dot product 2D)."
+    },
+    {
+        "type": "mcq",
+        "category": "NumPy - Counting",
+        "question": "Để đếm tần số các số nguyên không âm trong mảng 1D nhanh nhất với O(N), hàm nào tốt nhất?",
+        "options": [
+            "np.unique(A, return_counts=True)",
+            "np.bincount(A)",
+            "np.histogram(A)",
+            "collections.Counter(A)"
+        ],
+        "correct": 1,
+        "explanation": "`np.bincount` chạy với độ phức tạp tuyến tính O(N) và rất tối ưu cho số nguyên dương nhỏ. `np.unique` cần O(N log N) do phải sort dữ liệu."
+    },
+    {
+        "type": "mcq",
+        "category": "NumPy - Memory Allocation",
+        "question": "Sự khác biệt chính giữa `np.empty(shape)` và `np.zeros(shape)` là gì?",
+        "options": [
+            "`np.empty` chậm hơn.",
+            "`np.empty` không khởi tạo giá trị (lấy dữ liệu rác trên RAM) nên nhanh hơn, trong khi `np.zeros` ghi số 0 lên toàn bộ.",
+            "Không có khác biệt.",
+            "`np.empty` tạo mảng view."
+        ],
+        "correct": 1,
+        "explanation": "`np.empty` chỉ cấp phát block nhớ mà không clear, giúp tiết kiệm thời gian, phù hợp khi ta chắc chắn sẽ fill lại giá trị sau đó."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Memory",
+        "question": "Khi làm việc với DataFrame có cột chứa text nhưng chỉ gồm vài giá trị lặp lại nhiều lần (VD: 'Male', 'Female'), cách tốt nhất để giảm bộ nhớ là:",
+        "options": [
+            "df['col'] = df['col'].astype(str)",
+            "df['col'] = df['col'].astype('object')",
+            "df['col'] = df['col'].astype('category')",
+            "Sử dụng SparseDtype"
+        ],
+        "correct": 2,
+        "explanation": "Chuyển sang kiểu `category` giúp ánh xạ các string dài thành các mã số nguyên (integer codes), tiết kiệm đáng kể bộ nhớ (đôi khi >90%)."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Merge",
+        "question": "Trong xử lý dữ liệu Time Series, để merge 2 dataframe theo thời gian gần nhất (không cần khớp chính xác time), hàm nào nên dùng?",
+        "options": [
+            "pd.merge(how='outer')",
+            "pd.merge_ordered()",
+            "pd.merge_asof()",
+            "pd.concat()"
+        ],
+        "correct": 2,
+        "explanation": "`pd.merge_asof` (As-of merge) thực hiện match row gần nhất dựa trên giá trị (thường là datetime). Nó hỗ trợ `direction='backward'/'forward'/'nearest'` rất hiệu quả."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Warning",
+        "question": "Lỗi `SettingWithCopyWarning` thường xuất hiện khi nào?",
+        "options": [
+            "Khi copy DataFrame bằng `.copy()`",
+            "Khi gán giá trị thông qua chained indexing, ví dụ `df[df['A'] > 0]['B'] = 1`",
+            "Khi gọi `df.dropna(inplace=True)`",
+            "Khi dùng `.loc` để select dòng"
+        ],
+        "correct": 1,
+        "explanation": "Chained indexing `df[mask]['B'] = 1` gồm 2 phép toán: `__getitem__` và `__setitem__`. Pandas không đảm bảo object trung gian là view hay copy, nên gán giá trị có thể không tác động lên `df` gốc, gây ra warning."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Optimization",
+        "question": "Đối với DataFrame rất lớn, hàm `df.eval('A + B')` tối ưu bộ nhớ nhờ thư viện backend nào?",
+        "options": [
+            "Numexpr",
+            "Cython",
+            "Numba",
+            "Dask"
+        ],
+        "correct": 0,
+        "explanation": "`pd.eval()` và `pd.query()` sử dụng Numexpr dưới hood. C Parser này có khả năng tính toán biểu thức element-wise mảng lớn mà không sinh ra intermediate arrays, tiết kiệm RAM."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - TimeSeries",
+        "question": "Khi downsample chuỗi thời gian bằng `df.resample('5min', closed='right', label='right').sum()`, một data point lúc 09:05 sẽ thuộc về khoảng nào?",
+        "options": [
+            "09:00 - 09:05",
+            "09:05 - 09:10",
+            "Cả hai",
+            "Bị bỏ qua"
+        ],
+        "correct": 0,
+        "explanation": "`closed='right'` nghĩa là khoảng thời gian bao gồm giá trị bên phải $(a, b]$. Điểm 09:05 sẽ nằm trong khoảng $(09:00, 09:05]$. `label='right'` sẽ đặt index cho dòng này là 09:05."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Pivot",
+        "question": "Hàm `pivot_table` mặc định sẽ xử lý thế nào đối với các hàng chứa `NaN` trong cột tính toán, nếu `dropna=True`?",
+        "options": [
+            "Báo lỗi",
+            "Thay thế bằng 0",
+            "Loại bỏ các columns/rows mà TẤT CẢ các mục nhập đều là NaN trong output",
+            "Forward fill"
+        ],
+        "correct": 2,
+        "explanation": "Trong `pd.pivot_table`, tham số `dropna=True` (mặc định) có nghĩa là nó sẽ không bao gồm các cột hoặc hàng kết quả mà tất cả các giá trị tổng hợp của nó là NaN."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - IO",
+        "question": "Tham số `chunksize` trong `pd.read_csv()` trả về đối tượng gì?",
+        "options": [
+            "DataFrame đã nối",
+            "TextFileReader iterator để duyệt qua từng chunk của DataFrame",
+            "Một list các DataFrames",
+            "Dask DataFrame"
+        ],
+        "correct": 1,
+        "explanation": "Khai báo `chunksize=N` sẽ biến kết quả trả về của `read_csv` thành một iterator `TextFileReader`, cho phép đọc file lớn từng block N dòng."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Apply",
+        "question": "So với `df.apply(func)`, dùng `df.transform(func)` có đặc điểm bắt buộc gì?",
+        "options": [
+            "Trả về cùng một object type với object truyền vào (ví dụ groupby df trả về df có cùng index và shape như gốc).",
+            "Chỉ dùng được cho string",
+            "Chạy song song",
+            "Cho phép aggregate giảm số chiều"
+        ],
+        "correct": 0,
+        "explanation": "`transform` bắt buộc phải trả về object cùng kích thước (shape) hoặc có thể broadcast về cùng kích thước với dữ liệu đầu vào, hữu ích khi muốn gán kết quả thống kê lại cho từng dòng gốc."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Shape",
+        "question": "Sự khác nhau cơ bản giữa `stack()` và `melt()` là gì?",
+        "options": [
+            "`stack` tác động lên index (MultiIndex), `melt` nén các cột thành 2 cột 'variable' và 'value'.",
+            "`stack` dùng cho DataFrame, `melt` dùng cho Series.",
+            "Giống nhau hoàn toàn.",
+            "`melt` sinh ra MultiIndex, `stack` thì không."
+        ],
+        "correct": 0,
+        "explanation": "`stack()` di chuyển column levels thành index levels (tạo MultiIndex Series), trong khi `melt()` 'unpivot' bảng bằng cách gom nhiều cột lại thành định dạng long form (cột key và value)."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Merge",
+        "question": "Tham số `validate` trong `pd.merge()` dùng để làm gì?",
+        "options": [
+            "Kiểm tra kiểu dữ liệu các cột.",
+            "Kiểm tra tính duy nhất của quan hệ join (ví dụ '1:1', '1:m', 'm:1').",
+            "Xác thực DataFrame không rỗng.",
+            "Tự động ép kiểu."
+        ],
+        "correct": 1,
+        "explanation": "`validate='1:1'` hoặc `'1:m'` giúp Pandas quăng lỗi `MergeError` nếu key join không thỏa mãn số lượng ràng buộc kỳ vọng, tránh rủi ro Cartesian explosion sinh ra dữ liệu khổng lồ ngoài ý muốn."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Missing Data",
+        "question": "Tham số `method='time'` trong `df.interpolate()` hoạt động như thế nào?",
+        "options": [
+            "Điền NaN theo thời gian tuyến tính dựa trên DatetimeIndex.",
+            "Điền bằng giá trị timestamp hiện tại.",
+            "Báo lỗi nếu không có cột 'time'.",
+            "Tự động resample."
+        ],
+        "correct": 0,
+        "explanation": "`interpolate(method='time')` sử dụng `DatetimeIndex` để nội suy tuyến tính các điểm NaN dựa trên khoảng cách thời gian thực tế giữa các điểm có sẵn."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Operation",
+        "question": "Hàm `df.explode('col')` có chức năng gì?",
+        "options": [
+            "Phá hủy cột.",
+            "Tách cột string thành nhiều cột.",
+            "Chuyển đổi một cột chứa list/array thành nhiều dòng, nhân bản giá trị các cột khác tương ứng.",
+            "Mở rộng chiều của mảng 2D."
+        ],
+        "correct": 2,
+        "explanation": "`explode` mở từng list-like element trong một cell thành từng hàng riêng biệt (flattening), giúp xử lý JSON nested hoặc arrays dễ dàng."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Optimization",
+        "question": "Để merge hai DataFrame siêu lớn dựa trên index của chúng, hàm nào cho hiệu năng O(N) nhanh nhất?",
+        "options": [
+            "pd.merge(df1, df2, on='id')",
+            "df1.join(df2, how='inner')",
+            "pd.concat([df1, df2], axis=1, join='inner')",
+            "Cả 3 giống nhau"
+        ],
+        "correct": 1,
+        "explanation": "`df1.join(df2)` mặc định join trực tiếp trên Index, bỏ qua bước tìm hash keys, tối ưu hóa C dưới backend tốt hơn `merge` khi đã setup sẵn Index."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - CV",
+        "question": "Mục đích chính của Nested Cross-Validation là gì?",
+        "options": [
+            "Giảm thời gian train",
+            "Đánh giá hiệu suất thực tế của mô hình một cách không thiên lệch (unbiased) khi có hyperparameter tuning.",
+            "Tăng số lượng dữ liệu train",
+            "Giải quyết imbalanced data"
+        ],
+        "correct": 1,
+        "explanation": "Trong Nested CV, vòng lặp trong (inner loop) dùng để tuning hyperparams (GridSearchCV), vòng ngoài (outer loop) đánh giá sai số mô hình độc lập, tránh rò rỉ dữ liệu (overfitting vào tập validation)."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Data Leakage",
+        "question": "Lỗi Data Leakage nào xảy ra nếu ta gọi `StandardScaler().fit_transform(X)` TRƯỚC KHI thực hiện `cross_val_score`?",
+        "options": [
+            "Không bị rò rỉ.",
+            "StandardScaler học thông số (mean, std) từ cả tập Validation/Test của CV, dẫn đến điểm CV cao ảo tưởng.",
+            "Scale làm mất thông tin outlier.",
+            "Làm chậm quá trình CV."
+        ],
+        "correct": 1,
+        "explanation": "Việc gọi `fit_transform` trên toàn bộ tập $X$ khiến thông tin về test fold bị rò rỉ vào bước preprocessing. Giải pháp chuẩn là đưa `StandardScaler` vào trong `Pipeline`."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Tuning",
+        "question": "Tham số `refit=True` (mặc định) trong `GridSearchCV` thực hiện điều gì SAU KHI tìm ra best parameters?",
+        "options": [
+            "In ra tham số tốt nhất.",
+            "Xóa bộ nhớ đệm.",
+            "Tự động train lại mô hình trên TOÀN BỘ dữ liệu đầu vào `X` bằng bộ siêu tham số tốt nhất.",
+            "Khởi động lại lưới tìm kiếm."
+        ],
+        "correct": 2,
+        "explanation": "Khi `refit=True`, sau quá trình CV đánh giá, mô hình được fit lại một lần nữa trên toàn bộ dữ liệu cung cấp, cho phép gọi `.predict()` trực tiếp trên object `GridSearchCV`."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Splitting",
+        "question": "Sự khác biệt giữa `KFold` và `GroupKFold` là gì?",
+        "options": [
+            "`GroupKFold` tự động stratify (cân bằng) class distribution.",
+            "`GroupKFold` đảm bảo các mẫu từ cùng một nhóm (group/ID) không bị chia cắt giữa tập train và tập test trong cùng một fold.",
+            "Không khác gì.",
+            "`GroupKFold` dùng cho dữ liệu Time Series."
+        ],
+        "correct": 1,
+        "explanation": "`GroupKFold` cực kì quan trọng trong y tế hoặc user-data, ngăn chặn rò rỉ dữ liệu khi nhiều mẫu đến từ cùng một thực thể (ví dụ 5 ảnh của cùng một bệnh nhân)."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Pipeline",
+        "question": "Để tránh việc một Transformer đắt đỏ (như PCA lớn) phải tính lại trong mỗi bước GridSearchCV, `Pipeline` cung cấp giải pháp gì?",
+        "options": [
+            "Đặt tham số `n_jobs=-1`",
+            "Sử dụng tham số `memory='cachedir'` để lưu kết quả của Transformer vào đĩa cứng (joblib).",
+            "Dùng FeatureUnion",
+            "Không thể tránh được."
+        ],
+        "correct": 1,
+        "explanation": "Gán `Pipeline(..., memory='my_cache')` cho phép cache (joblib) kết quả của các transformers sau khi fit_transform. Lần CV sau, nếu params của Transformer không đổi, Pipeline sẽ load kết quả trực tiếp từ đĩa."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Metrics",
+        "question": "Khi tạo custom metric bằng `make_scorer` để dùng trong GridSearch, nếu metric của bạn yêu cầu xác suất (vd: ROC_AUC), bạn phải truyền tham số nào?",
+        "options": [
+            "`needs_proba=True` (hoặc `response_method='predict_proba'` trong bản mới).",
+            "`is_classification=True`",
+            "`probability=True`",
+            "`greater_is_better=True`"
+        ],
+        "correct": 0,
+        "explanation": "Nếu custom metric tính toán dựa trên xác suất, hàm scoring phải biết để gọi `estimator.predict_proba()` thay vì `predict()`. `needs_proba=True` chỉ định việc này."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Transformers",
+        "question": "Trong `ColumnTransformer`, tham số `sparse_threshold` hoạt động thế nào?",
+        "options": [
+            "Loại bỏ các cột có quá nhiều số 0.",
+            "Nếu tỷ lệ các giá trị khác 0 của đầu ra tổng hợp thấp hơn ngưỡng này, nó sẽ trả về ma trận `scipy.sparse` thay vì numpy mảng đặc để tiết kiệm bộ nhớ.",
+            "Ép kiểu dữ liệu sang boolean.",
+            "Tự sinh sparse pca."
+        ],
+        "correct": 1,
+        "explanation": "`sparse_threshold` mặc định 0.3. Nếu tỷ lệ phần tử != 0 của kết quả stacked bé hơn 0.3, kết quả trả về là ma trận thưa (đặc biệt hữu dụng khi kết hợp OneHotEncoder và text TFIDF)."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Big Data",
+        "question": "Làm thế nào để train mô hình Machine Learning trên tập dữ liệu vượt quá dung lượng RAM trong Scikit-Learn?",
+        "options": [
+            "Chỉ định tham số `memory='auto'`",
+            "Tăng kích thước batch size",
+            "Dùng các mô hình hỗ trợ Out-of-core learning thông qua hàm `partial_fit()`",
+            "Dùng GridSearchCV"
+        ],
+        "correct": 2,
+        "explanation": "Các mô hình như `SGDClassifier`, `MiniBatchKMeans`, `MultinomialNB` hỗ trợ `partial_fit()`, cho phép feed dữ liệu từng chunk nhỏ dần dần mà không cần load toàn bộ RAM."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Validation",
+        "question": "Hàm `cross_val_predict` khác với `cross_val_score` ở điểm cốt lõi nào?",
+        "options": [
+            "Trả về độ chính xác thay vì error.",
+            "Trả về mảng predictions dự đoán trên từng mẫu dữ liệu khi chúng nằm trong tập validation fold, không phải list điểm số.",
+            "Chạy nhanh hơn do không tune hyperparam.",
+            "Không hỗ trợ stratification."
+        ],
+        "correct": 1,
+        "explanation": "`cross_val_predict` tổ hợp lại các dự đoán out-of-fold cho toàn bộ dataset. Hữu dụng để tạo meta-features cho Stacking hoặc vẽ đường ROC thực tế."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Tuning",
+        "question": "Tại sao nên dùng `HalvingGridSearchCV` (Successive Halving) thay cho `GridSearchCV` thông thường khi không gian tham số quá lớn?",
+        "options": [
+            "Vì nó dùng thuật toán Genetic để lai ghép.",
+            "Nó huấn luyện toàn bộ tham số nhưng cắt bớt số cây (trees).",
+            "Nó cấp phát tăng dần tài nguyên (như số mẫu n_samples) và loại bỏ dần một nửa số lượng tham số kém nhất, giúp hội tụ nhanh siêu cấp.",
+            "Nó chia đều tham số cho GPU."
+        ],
+        "correct": 2,
+        "explanation": "Successive Halving đánh giá toàn bộ tổ hợp trên lượng nhỏ data. Sau đó giữ lại top x% tốt nhất, nhân đôi số lượng data và lặp lại cho đến khi đạt toàn bộ data, tiết kiệm vô số thời gian so với train full data ngay từ đầu."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Development",
+        "question": "Để viết một Custom Transformer tương thích với Pipeline, class của bạn nên kế thừa từ các base class nào?",
+        "options": [
+            "`BaseEstimator` và `TransformerMixin`",
+            "`PipelineMixin`",
+            "`GridSearchMixin`",
+            "`CustomTransformer`"
+        ],
+        "correct": 0,
+        "explanation": "`BaseEstimator` cung cấp `get_params` và `set_params` (cho GridSearch). `TransformerMixin` cung cấp tự động `fit_transform()` nếu bạn định nghĩa `fit()` và `transform()`."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - CV Strategy",
+        "question": "Để chia một tập dữ liệu y tế Imbalanced (ví dụ: Chẩn đoán hiếm), và có sự lặp lại của cùng bệnh nhân (mỗi người chụp 5 tấm ảnh X-Quang), bạn NÊN dùng Class chia fold nào?",
+        "options": [
+            "KFold",
+            "StratifiedKFold",
+            "GroupKFold",
+            "StratifiedGroupKFold"
+        ],
+        "correct": 3,
+        "explanation": "`StratifiedGroupKFold` vừa đảm bảo tỷ lệ nhãn (Stratified) qua các fold, vừa đảm bảo tính độc lập nhóm (Group) - tức ảnh của cùng bệnh nhân không nằm ở train/test chung."
+    },
+    {
+        "type": "mcq",
+        "category": "Python Advanced - Memory",
+        "question": "Trong Python, cú pháp `__slots__ = ['a', 'b']` bên trong một Class có mục đích tối ưu gì?",
+        "options": [
+            "Ngăn không cho đổi tên class.",
+            "Vô hiệu hóa `__dict__` động của object, cấp phát cố định bộ nhớ cho thuộc tính, giúp tiết kiệm bộ nhớ RAM đáng kể khi khởi tạo hàng triệu object.",
+            "Buộc các thuộc tính phải là private.",
+            "Đẩy object lưu trữ sang GPU."
+        ],
+        "correct": 1,
+        "explanation": "Mỗi Python instance mặc định có một `__dict__` lưu attribute gây lãng phí bộ nhớ. `__slots__` giới hạn thuộc tính theo cấu trúc C tĩnh, tiết kiệm RAM."
+    },
+    {
+        "type": "mcq",
+        "category": "Python Advanced - Iteration",
+        "question": "Sự khác biệt cốt lõi về RAM khi dùng List Comprehension `[x**2 for x in data]` và Generator Expression `(x**2 for x in data)` cho 1 triệu phần tử?",
+        "options": [
+            "List cấp phát RAM lưu liền 1 triệu kết quả. Generator lưu state và sinh lazy (từng phần tử một), RAM gần như ~0.",
+            "Generator nhanh hơn List Comprehension.",
+            "Cả hai giống nhau nếu `data` là numpy array.",
+            "List comprehension không hỗ trợ filter."
+        ],
+        "correct": 0,
+        "explanation": "Generator trả về iterator (yield). Nó không giữ toàn bộ mảng trong RAM mà tính toán và trả về on-the-fly, là kĩ thuật thiết yếu để load file siêu lớn."
+    },
+    {
+        "type": "mcq",
+        "category": "Python Advanced - Parallelism",
+        "question": "Khái niệm `GIL` (Global Interpreter Lock) trong CPython ảnh hưởng thế nào đến đa luồng (threading) khi xử lý NumPy array hoặc Pandas DataFrame?",
+        "options": [
+            "Chặn hoàn toàn đa luồng chạy song song trên nhiều lõi CPU đối với mọi tác vụ.",
+            "Tuy GIL giới hạn code thuần Python, đa số hàm tính toán nặng của NumPy/Pandas viết bằng C đã giải phóng (release) GIL, do đó vẫn hưởng lợi từ multithreading.",
+            "Làm crash bộ nhớ.",
+            "Bắt buộc dùng Cython để bypass."
+        ],
+        "correct": 1,
+        "explanation": "NumPy release GIL (ví dụ khi gọi `np.dot`). Nhờ vậy `ThreadPoolExecutor` trong Python vẫn chạy tính toán ma trận song song (CPU bound) rất hiệu quả mà không cần spawn multiprocessing."
+    },
+    {
+        "type": "mcq",
+        "category": "Python Advanced - Profiling",
+        "question": "Vì sao hàm `sys.getsizeof()` thường báo sai dung lượng bộ nhớ đối với các object phức tạp như dictionary chứa custom class?",
+        "options": [
+            "Do lỗi của module sys.",
+            "Bởi vì nó chỉ đo kích thước nông (shallow) của con trỏ và object struct gốc, bỏ qua kích thước của các nested object mà nó trỏ tới.",
+            "Nó tính thêm RAM ảo swap.",
+            "Nó chỉ đếm string."
+        ],
+        "correct": 1,
+        "explanation": "`getsizeof` không thực hiện đệ quy lướt qua references graph. Để đo chuẩn dung lượng deep cần công cụ như `pympler.asizeof`."
+    },
+    {
+        "type": "mcq",
+        "category": "Python Advanced - GC",
+        "question": "Trong Python, module `gc.collect()` được gọi tường minh (explicitly) để giải quyết vấn đề gì mà Reference Counting không bắt được?",
+        "options": [
+            "Reference bị gán Null.",
+            "Giải phóng các Cyclic References (tham chiếu vòng) không sử dụng nữa.",
+            "Reset trạng thái biến toàn cục.",
+            "Dọn dẹp log file."
+        ],
+        "correct": 1,
+        "explanation": "Garbage Collector phân thế hệ của Python có vai trò chính là tìm và dọn các cụm object tham chiếu chéo lẫn nhau (VD: object A trỏ B, B trỏ A) có refcount > 0 nhưng bị cô lập khỏi chương trình chính."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Indexing",
+        "question": "Cách an toàn và tối ưu nhất để dùng `.loc` slicer cắt dòng trên `MultiIndex` Dataframe là?",
+        "options": [
+            "df.loc[('A', 'B'), :]",
+            "Sử dụng đối tượng `pd.IndexSlice`, ví dụ: `idx = pd.IndexSlice; df.loc[idx[:, 'B'], :]`",
+            "df.loc['A']['B']",
+            "df.unstack()['B']"
+        ],
+        "correct": 1,
+        "explanation": "`pd.IndexSlice` (hoặc tuples) cho phép slicing sâu, nhiều cấp qua các chiều MultiIndex mà không gây `LexsortDepthWarning` hoặc Performance Warning nếu index được sorted."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Transformers",
+        "question": "Lớp `FunctionTransformer(func, validate=False)` hữu dụng nhất trong Pipeline khi nào?",
+        "options": [
+            "Khi cần scale dữ liệu.",
+            "Khi cần nhúng một hàm xử lý stateless đơn giản (ví dụ `np.log1p`) vào luồng CV.",
+            "Khi cần train mạng Neural.",
+            "Khi muốn dump Pickle."
+        ],
+        "correct": 1,
+        "explanation": "Biến hàm Python thành Transformer chuẩn mà không cần viết Class phức tạp. Rất tiện cho các phép biến đổi non-parametric không yêu cầu bước `fit()`."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - String",
+        "question": "Để tối ưu tìm kiếm chuỗi văn bản bằng Regex trên một Series hàng triệu bản ghi, pandas `.str` accessor sử dụng engine nào để tăng tốc ở các bản pandas >= 1.5.0?",
+        "options": [
+            "re module của Python mặc định",
+            "PyArrow string backend (nếu dtype là string[pyarrow])",
+            "C++ backend thuần túy",
+            "NLTK"
+        ],
+        "correct": 1,
+        "explanation": "Sử dụng pyarrow backend `pd.Series(..., dtype='string[pyarrow]')` đem lại tốc độ xử lý string nhanh gấp nhiều lần so với object strings cấp phát động của Python core."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Imbalanced",
+        "question": "Trong Scikit-Learn, tham số `class_weight='balanced'` trong LogisticRegression tính trọng số nghịch đảo dựa trên công thức nào?",
+        "options": [
+            "n_samples / (n_classes * np.bincount(y))",
+            "n_classes / n_samples",
+            "np.log(n_samples)",
+            "1 / np.sqrt(y)"
+        ],
+        "correct": 0,
+        "explanation": "Trọng số class tỉ lệ nghịch với tần suất xuất hiện, `n_samples / (n_classes * count(class_i))`, phạt mô hình nhiều hơn nếu nó đoán sai minority class."
+    },
+    {
+        "type": "mcq",
+        "category": "Python Advanced - Itertools",
+        "question": "Để bỏ qua 10 dòng đầu của generator csv reader mà không load vào bộ nhớ, hàm nào trong `itertools` cực kì hiệu quả?",
+        "options": [
+            "itertools.chain",
+            "itertools.groupby",
+            "itertools.islice",
+            "itertools.takewhile"
+        ],
+        "correct": 2,
+        "explanation": "`islice(iterator, 10, None)` duyệt tiêu thụ (consume) 10 dòng đầu bằng iterator mức C một cách lazy, cực nhanh và không tốn bộ nhớ lưu List."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Ensembles",
+        "question": "Tham số `n_jobs=-1` có ý nghĩa là gì đối với mô hình RandomForestClassifier?",
+        "options": [
+            "Sử dụng 1 core CPU.",
+            "Tắt multiprocessing.",
+            "Sử dụng toàn bộ các threads/cores hiện có của CPU để song song hóa quá trình fit cây.",
+            "Giới hạn RAM không vượt quá 1GB."
+        ],
+        "correct": 2,
+        "explanation": "Giá trị `-1` được backend Joblib hiểu là sử dụng `os.cpu_count()` processors để train các estimators độc lập (cây) hoàn toàn song song."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Resample",
+        "question": "Giả sử bạn gộp dữ liệu theo giờ (`df.resample('H')`), để kết hợp nhiều agg functions khác nhau trên nhiều cột (ví dụ: tổng cho cột lượng, giá trị cuối cho cột giá), bạn dùng cú pháp nào?",
+        "options": [
+            "df.resample('H').agg({'amount': 'sum', 'price': 'last'})",
+            "df.resample('H').sum().last()",
+            "df.resample('H', cols=['amount','price'])",
+            "Không thể thực hiện"
+        ],
+        "correct": 0,
+        "explanation": "`agg()` dictionary cho phép định tuyến chính xác các cột khác nhau tới các hàm thống kê (aggregations) khác nhau cực kỳ linh hoạt."
+    },
+    {
+        "type": "mcq",
+        "category": "NumPy - Masking",
+        "question": "Trong NumPy, giá trị `~np.isnan(X)` thực hiện chức năng gì?",
+        "options": [
+            "Chuyển số NaN thành 0",
+            "Tạo một boolean mask True tại những vị trí dữ liệu hợp lệ (KHÔNG phải NaN)",
+            "Tìm vị trí của chuỗi",
+            "Đảo ngược trục"
+        ],
+        "correct": 1,
+        "explanation": "Toán tử `~` là Bitwise NOT, kết hợp với vectorization sẽ đảo ngược boolean array. Khái niệm này áp dụng rông rãi để filter non-missing data."
+    },
+    {
+        "type": "mcq",
+        "category": "Pandas - Memory Optimization",
+        "question": "Trong Pandas, hàm `downcast` của `pd.to_numeric` giúp ích gì?",
+        "options": [
+            "Chuyển số thành string.",
+            "Ép kiểu dữ liệu float64/int64 thành kiểu nhỏ nhất có thể (float32, int8...) mà không làm mất mát độ chính xác, giúp giảm thiểu footprint bộ nhớ.",
+            "Hạ bậc của dataframe về series.",
+            "Chuyển array thành generator."
+        ],
+        "correct": 1,
+        "explanation": "Sử dụng `pd.to_numeric(col, downcast='integer'/'float')` là một trong những best practice để tối ưu memory footprint, chuyển các số nguyên nhỏ về `int8` hoặc `int16` thay vì `int64` mặc định."
+    },
+    {
+        "type": "mcq",
+        "category": "Scikit-Learn - Preprocessing",
+        "question": "Tại sao `OneHotEncoder` của Scikit-Learn lại có tham số `handle_unknown='ignore'`?",
+        "options": [
+            "Để bỏ qua các lỗi crash.",
+            "Để khi gặp class/giá trị mới hoàn toàn ở tập Test mà không có trong lúc train, nó sẽ gán toàn bộ array encode thành 0 thay vì văng Exception.",
+            "Để không học class mới.",
+            "Để tự động xóa dòng test đó."
+        ],
+        "correct": 1,
+        "explanation": "Trong môi trường Production/Cross-validation, rất hay gặp class categoricals bị bỏ sót trong train set. `handle_unknown='ignore'` giúp Pipeline không bị crash."
+    }
+]
 ];
